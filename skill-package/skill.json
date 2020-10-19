@@ -33,9 +33,8 @@
         "en-US": {
           "description": "Guess a number, and Alexa will tell you if you need to guess higher or lower. She will also tell you how many times you have played.",
           "examplePhrases": [
-            "Alexa open high low game",
-            "Alexa start high low game",
-            "Alexa ask high low game is it {number}"
+            "Alexa open my cafe",
+            "Alexa open my cafeteria"
           ],
           "name": "My Cafe",
           "summary": "Guess a number, and Alexa will tell you if you need to guess higher or lower."
