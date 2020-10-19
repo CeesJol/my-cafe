@@ -1,53 +1,99 @@
 {
-  "interactionModel": {
-    "languageModel": {
-      "invocationName": "my cafeteria",
-      "intents": [
-        {
-          "name": "AMAZON.CancelIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.HelpIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.StopIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.YesIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.FallbackIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.NoIntent",
-          "samples": []
-        },
-        {
-          "name": "NumberGuessIntent",
-          "slots": [
-            {
-              "name": "number",
-              "type": "AMAZON.NUMBER"
-            }
-          ],
-          "samples": [
-            "{number}",
-            "is it {number}",
-            "how about {number}",
-            "could be {number}"
-          ]
-        },
-        {
-          "name": "AMAZON.NavigateHomeIntent",
-          "samples": []
-        }
-      ]
-    }
-  },
-  "version": "1"
+	"interactionModel": {
+			"languageModel": {
+					"invocationName": "my cafeteria",
+					"modelConfiguration": {
+							"fallbackIntentSensitivity": {
+									"level": "LOW"
+							}
+					},
+					"intents": [
+							{
+									"name": "AMAZON.CancelIntent",
+									"samples": []
+							},
+							{
+									"name": "AMAZON.HelpIntent",
+									"samples": []
+							},
+							{
+									"name": "AMAZON.StopIntent",
+									"samples": []
+							},
+							{
+									"name": "AMAZON.YesIntent",
+									"samples": []
+							},
+							{
+									"name": "AMAZON.FallbackIntent",
+									"samples": []
+							},
+							{
+									"name": "AMAZON.NoIntent",
+									"samples": []
+							},
+							{
+									"name": "BuyMachineIntent",
+									"slots": [
+											{
+													"name": "machine",
+													"type": "machine"
+											}
+									],
+									"samples": []
+							},
+							{
+									"name": "AMAZON.NavigateHomeIntent",
+									"samples": []
+							},
+							{
+									"name": "NextWeekIntent",
+									"slots": [],
+									"samples": [
+											"continue game",
+											"turn to next week",
+											"take turn",
+											"next week"
+									]
+							}
+					],
+					"types": [
+							{
+									"name": "machine",
+									"values": [
+											{
+													"name": {
+															"value": "latte machine"
+													}
+											},
+											{
+													"name": {
+															"value": "americano machine"
+													}
+											},
+											{
+													"name": {
+															"value": "espresso machine"
+													}
+											},
+											{
+													"name": {
+															"value": "cappuccino machine"
+													}
+											},
+											{
+													"name": {
+															"value": "tea machine"
+													}
+											},
+											{
+													"name": {
+															"value": "coffee machine"
+													}
+											}
+									]
+							}
+					]
+			}
+	}
 }

@@ -31,13 +31,13 @@
       "isAvailableWorldwide": true,
       "locales": {
         "en-US": {
-          "description": "Guess a number, and Alexa will tell you if you need to guess higher or lower. She will also tell you how many times you have played.",
+          "description": "Create a cafe, decide your strategy and earn income!",
           "examplePhrases": [
             "Alexa open my cafe",
             "Alexa open my cafeteria"
           ],
           "name": "My Cafe",
-          "summary": "Guess a number, and Alexa will tell you if you need to guess higher or lower."
+          "summary": "Create a cafe, decide your strategy and earn income!"
         }
       },
       "testingInstructions": "Sample Testing Instructions."
