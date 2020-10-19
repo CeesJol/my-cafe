@@ -61,8 +61,12 @@ const LaunchRequest = {
     attributesManager.setSessionAttributes(attributes);
 
     const gamesPlayed = attributes.gamesPlayed.toString();
-    const speechOutput = requestAttributes.t(
-      attributes.gamesPlayed === 0 ? "START_EMPLOYEE" : "LAUNCH_MESSAGE",
+
+    // Initialisation message if you haven't played yet
+    // Shorten the output if debugging
+    let speechOutput = requestAttributes.t(
+      (attributes.gamesPlayed === 0 ? "START_EMPLOYEE" : "LAUNCH_MESSAGE") +
+        (attributes ? "_DEV" : ""),
       gamesPlayed
     );
 
@@ -242,6 +246,49 @@ const BuyMachineIntent = {
     const chosenMachine = getMachine(machine);
     console.log("chosenMachine:", chosenMachine);
 
+    try {
+      attributesManager.setPersistentAttributes(sessionAttributes);
+      await attributesManager.savePersistentAttributes();
+    } catch (e) {}
+
+    if (sessionAttributes.week === 1) {
+      return handlerInput.responseBuilder
+        .speak(requestAttributes.t("START_MACHINE_CONFIRM"))
+        .reprompt(requestAttributes.t("BIG_OOF"))
+        .getResponse();
+    }
+    return handlerInput.responseBuilder
+      .speak(requestAttributes.t("BUY_MACHINE_CONFIRM", chosenMachine.name))
+      .reprompt(requestAttributes.t("BIG_OOF"))
+      .getResponse();
+  },
+};
+
+const NextWeekIntent = {
+  canHandle(handlerInput) {
+    // handle next week intent only during a game
+    let isCurrentlyPlaying = false;
+    const { attributesManager } = handlerInput;
+    const sessionAttributes = attributesManager.getSessionAttributes();
+
+    if (
+      sessionAttributes.gameState &&
+      sessionAttributes.gameState === "PLAYING"
+    ) {
+      isCurrentlyPlaying = true;
+    }
+
+    return (
+      isCurrentlyPlaying &&
+      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === "BuyMachineIntent"
+    );
+  },
+  async handle(handlerInput) {
+    const { attributesManager } = handlerInput;
+    const requestAttributes = attributesManager.getRequestAttributes();
+    const sessionAttributes = attributesManager.getSessionAttributes();
+
     sessionAttributes.week++;
 
     try {
@@ -369,6 +416,7 @@ exports.handler = skillBuilder
     YesIntent,
     NoIntent,
     BuyMachineIntent,
+    NextWeekIntent,
     FallbackHandler,
     UnhandledIntent
   )

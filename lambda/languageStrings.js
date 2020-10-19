@@ -7,6 +7,7 @@ module.exports = {
     EXIT_MESSAGE: "Thanks for playing!",
     // Game start
     LAUNCH_MESSAGE: `Welcome back to My Cafe. ${NEXT_WEEK}`,
+    START_EMPLOYEE_DEV: `Welcome back to My Cafe, dev.`,
     START_EMPLOYEE: `Welcome to My Cafe. 
 		In My Cafe, you build your cafe to a respected and warm place for your customers to get drinks and foods.
 		Your Italian friend, Antonio, is here to help you out as a barista.
@@ -15,6 +16,7 @@ module.exports = {
 		<voice name="${ANTONIO}">Hi there, I'm excited to get started.</voice>
 		Antonio will work in your restaurant for free for the first 4 weeks, after which you need to pay him 500 dollars per month.
 		Now, we need to buy a machine to produce drinks. Say 'Buy coffee machine' to buy your first machine!`,
+    START_EMPLOYEE_DEV: `Welcome to My Cafe, dev.`,
     START_MACHINE: `Do you want to buy 'Coffee machine' for 100 dollars? You have %s dollars.`,
     START_MACHINE_CONFIRM: `Great! You bought your first machine. Your cafe has officially opened. ${NEXT_WEEK}`,
     // Week turn
@@ -27,6 +29,8 @@ module.exports = {
 		%s
 		`,
     BIG_OOF: "Big oof!",
+    // Buying a machine
+    BUY_MACHINE_CONFIRM: `Great! You bought %s. ${NEXT_WEEK}`,
     // Basic stuff
     FALLBACK_MESSAGE_DURING_GAME: `I can't help you with that.  Try guessing a number between 0 and 100. `,
     FALLBACK_MESSAGE_OUTSIDE_GAME: `I can't help you with that.  I will come up with a number between 0 and 100 and you try to guess it by saying a number in that range. Would you like to play?`,
