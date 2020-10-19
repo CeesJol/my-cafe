@@ -7,7 +7,7 @@ module.exports = {
     EXIT_MESSAGE: "Thanks for playing!",
     // Game start
     LAUNCH_MESSAGE: `Welcome back to My Cafe. ${NEXT_WEEK}`,
-    START_EMPLOYEE_DEV: `Welcome back to My Cafe, dev.`,
+    LAUNCH_MESSAGE_DEV: `Welcome back to My Cafe, dev.`,
     START_EMPLOYEE: `Welcome to My Cafe. 
 		In My Cafe, you build your cafe to a respected and warm place for your customers to get drinks and foods.
 		Your Italian friend, Antonio, is here to help you out as a barista.
@@ -17,23 +17,25 @@ module.exports = {
 		Antonio will work in your restaurant for free for the first 4 weeks, after which you need to pay him 500 dollars per month.
 		Now, we need to buy a machine to produce drinks. Say 'Buy coffee machine' to buy your first machine!`,
     START_EMPLOYEE_DEV: `Welcome to My Cafe, dev.`,
-    START_MACHINE: `Do you want to buy 'Coffee machine' for 100 dollars? You have %s dollars.`,
-    START_MACHINE_CONFIRM: `Great! You bought your first machine. Your cafe has officially opened. ${NEXT_WEEK}`,
+    START_MACHINE_CONFIRM: `Great! You bought your first machine. You have %s dollars left. Your cafe has officially opened! ${NEXT_WEEK}`,
     // Week turn
     // - week number
     // - profit (dollars)
     // - upcoming event
     // - hint
-    WEEK_TURN: `A week has passed. It is now week %s. You made a profit of %s dollars.
+    WEEK_TURN: `A week has passed. It is now week %s. You made a profit of %s dollars, which brings you at a total of %s dollars.
 		%s
 		%s
 		`,
     BIG_OOF: "Big oof!",
     // Buying a machine
-    BUY_MACHINE_CONFIRM: `Great! You bought %s. ${NEXT_WEEK}`,
+    BUY_MACHINE_CONFIRM: `Great! You bought %s. You have %s dollars left. ${NEXT_WEEK}`,
+    BUY_MACHINE_UNKNOWN: `I did not recognize that machine. The next available in the store is the %s for %s dollars. ${NEXT_WEEK}`,
+    BUY_MACHINE_CANT_AFFORD: `You cannot afford the %s. It costs %s dollars, but you have only %s dollars. ${NEXT_WEEK}`,
+    BUY_MACHINE_ALREADY_PURCHASED: `You already own the %s. The next available in the store is the %s for %s dollars. ${NEXT_WEEK}`,
     // Basic stuff
-    FALLBACK_MESSAGE_DURING_GAME: `I can't help you with that.  Try guessing a number between 0 and 100. `,
-    FALLBACK_MESSAGE_OUTSIDE_GAME: `I can't help you with that.  I will come up with a number between 0 and 100 and you try to guess it by saying a number in that range. Would you like to play?`,
+    FALLBACK_MESSAGE_DURING_GAME: `I can't help you with that. Try guessing a number between 0 and 100. `,
+    FALLBACK_MESSAGE_OUTSIDE_GAME: `I can't help you with that. I will come up with a number between 0 and 100 and you try to guess it by saying a number in that range. Would you like to play?`,
     GUESS_CORRECT_MESSAGE: "%s is correct! Would you like to play again?",
     TOO_HIGH_MESSAGE: "%s is too high.",
     TOO_LOW_MESSAGE: "%s is too low.",

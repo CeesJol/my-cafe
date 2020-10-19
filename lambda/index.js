@@ -12,7 +12,7 @@ const languageStrings = {
   en: require("./languageStrings"),
 };
 const AWS = require("aws-sdk");
-const { getMachine } = require("./constants");
+const { getMachine, MACHINES, getProfit } = require("./constants");
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -41,7 +41,7 @@ const LaunchRequest = {
       // Initialize attributes for first open
       gamesPlayed: 420,
       debug: false,
-      week: 0,
+      week: 1,
       money: 500,
       ...attributes,
     };
@@ -55,19 +55,18 @@ const LaunchRequest = {
       attributes.gameState = "INIT";
       attributes.gamesPlayed = 0;
       attributes.money = 500;
-      attributes.week = 0;
+      attributes.week = 1;
+      attributes.machine = 0;
+      attributes.level = 1;
     }
 
     attributesManager.setSessionAttributes(attributes);
-
-    const gamesPlayed = attributes.gamesPlayed.toString();
 
     // Initialisation message if you haven't played yet
     // Shorten the output if debugging
     let speechOutput = requestAttributes.t(
       (attributes.gamesPlayed === 0 ? "START_EMPLOYEE" : "LAUNCH_MESSAGE") +
-        (attributes ? "_DEV" : ""),
-      gamesPlayed
+        (attributes ? "_DEV" : "")
     );
 
     return handlerInput.responseBuilder
@@ -218,14 +217,15 @@ const UnhandledIntent = {
 
 const BuyMachineIntent = {
   canHandle(handlerInput) {
-    // handle buying machines only during a game
+    // handle buying machines only during a game, or when starting one
     let isCurrentlyPlaying = false;
     const { attributesManager } = handlerInput;
     const sessionAttributes = attributesManager.getSessionAttributes();
 
     if (
       sessionAttributes.gameState &&
-      sessionAttributes.gameState === "PLAYING"
+      (sessionAttributes.gameState === "PLAYING" ||
+        sessionAttributes.gameState === "INIT")
     ) {
       isCurrentlyPlaying = true;
     }
@@ -246,20 +246,92 @@ const BuyMachineIntent = {
     const chosenMachine = getMachine(machine);
     console.log("chosenMachine:", chosenMachine);
 
+    if (!chosenMachine) {
+      // Chosen machine is not recognized
+
+      // Next machine purchasable
+      const nextMachine = MACHINES[sessionAttributes.machine];
+
+      const speechOutput = requestAttributes.t(
+        "BUY_MACHINE_UNKNOWN",
+        nextMachine.name,
+        nextMachine.cost
+      );
+
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .reprompt(speechOutput)
+        .getResponse();
+    } else if (chosenMachine.cost > sessionAttributes.money) {
+      // Chosen machine is too expensive
+
+      const speechOutput = requestAttributes.t(
+        "BUY_MACHINE_CANT_AFFORD",
+        chosenMachine.name,
+        chosenMachine.cost,
+        sessionAttributes.money
+      );
+
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .reprompt(speechOutput)
+        .getResponse();
+    } else if (sessionAttributes.machine > MACHINES.indexOf(chosenMachine)) {
+      // User already has this machine
+
+      // Next machine purchasable
+      const nextMachine = MACHINES[sessionAttributes.machine];
+
+      const speechOutput = requestAttributes.t(
+        "BUY_MACHINE_ALREADY_PURCHASED",
+        chosenMachine.name,
+        nextMachine.name,
+        nextMachine.cost
+      );
+
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .reprompt(speechOutput)
+        .getResponse();
+    }
+
+    sessionAttributes.money -= chosenMachine.cost;
+
     try {
       attributesManager.setPersistentAttributes(sessionAttributes);
       await attributesManager.savePersistentAttributes();
     } catch (e) {}
 
-    if (sessionAttributes.week === 1) {
+    if (sessionAttributes.week === 1 && sessionAttributes.machine === 0) {
+      // You bought the first machine, let's start the game!
+      sessionAttributes.gameState = "PLAYING";
+      sessionAttributes.machine++;
+
+      const speechOutput = requestAttributes.t(
+        "START_MACHINE_CONFIRM",
+        sessionAttributes.money
+      );
+
       return handlerInput.responseBuilder
-        .speak(requestAttributes.t("START_MACHINE_CONFIRM"))
-        .reprompt(requestAttributes.t("BIG_OOF"))
+        .speak(speechOutput)
+        .reprompt(speechOutput)
         .getResponse();
     }
+
+    // Buy specific machine (not the first one)
+    sessionAttributes.machine++;
+
+    const speechOutput = requestAttributes.t(
+      "BUY_MACHINE_CONFIRM",
+      chosenMachine.name,
+      sessionAttributes.money
+    );
+
+    console.log(sessionAttributes.machine, MACHINES.indexOf(chosenMachine));
+
     return handlerInput.responseBuilder
-      .speak(requestAttributes.t("BUY_MACHINE_CONFIRM", chosenMachine.name))
-      .reprompt(requestAttributes.t("BIG_OOF"))
+      .speak(speechOutput)
+      .reprompt(speechOutput)
       .getResponse();
   },
 };
@@ -281,7 +353,7 @@ const NextWeekIntent = {
     return (
       isCurrentlyPlaying &&
       Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
-      Alexa.getIntentName(handlerInput.requestEnvelope) === "BuyMachineIntent"
+      Alexa.getIntentName(handlerInput.requestEnvelope) === "NextWeekIntent"
     );
   },
   async handle(handlerInput) {
@@ -295,17 +367,26 @@ const NextWeekIntent = {
       attributesManager.setPersistentAttributes(sessionAttributes);
       await attributesManager.savePersistentAttributes();
     } catch (e) {}
+
+    const profit = getProfit(
+      sessionAttributes.level,
+      sessionAttributes.machine
+    );
+    console.log("profit:", profit);
+    sessionAttributes.money += profit;
+
+    const speechOutput = requestAttributes.t(
+      "WEEK_TURN",
+      sessionAttributes.week,
+      profit,
+      sessionAttributes.money,
+      "Some event",
+      "Some hint"
+    );
+
     return handlerInput.responseBuilder
-      .speak(
-        requestAttributes.t(
-          "WEEK_TURN",
-          sessionAttributes.week,
-          sessionAttributes.money,
-          "Some event",
-          "Some hint"
-        )
-      )
-      .reprompt(requestAttributes.t("BIG_OOF"))
+      .speak(speechOutput)
+      .reprompt(speechOutput)
       .getResponse();
   },
 };
