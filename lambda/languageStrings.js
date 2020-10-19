@@ -13,7 +13,7 @@ module.exports = {
 		Antonio said he could meet up to set up the cafe. 
 		<audio src="soundbank://soundlibrary/footsteps/wood/wood_09"/>
 		<voice name="${ANTONIO}">Hi there, I'm excited to get started.</voice>
-		He will work in your restaurant for free for the first 4 weeks, after which you need to pay him 500 dollars per month.
+		Antonio will work in your restaurant for free for the first 4 weeks, after which you need to pay him 500 dollars per month.
 		Now, we need to buy a machine to produce drinks. Say 'Buy coffee machine' to buy your first machine!`,
     START_MACHINE: `Do you want to buy 'Coffee machine' for 100 dollars? You have %s dollars.`,
     START_MACHINE_CONFIRM: `Great! You bought your first machine. Your cafe has officially opened. ${NEXT_WEEK}`,

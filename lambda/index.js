@@ -12,6 +12,7 @@ const languageStrings = {
   en: require("./languageStrings"),
 };
 const AWS = require("aws-sdk");
+const { getMachine } = require("./constants");
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -237,6 +238,10 @@ const BuyMachineIntent = {
     const sessionAttributes = attributesManager.getSessionAttributes();
 
     const machine = Alexa.getSlotValue(handlerInput.requestEnvelope, "machine");
+    console.log("machine:", machine);
+    const chosenMachine = getMachine(machine);
+    console.log("chosenMachine:", chosenMachine);
+
     sessionAttributes.week++;
 
     try {

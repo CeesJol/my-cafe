@@ -40,7 +40,11 @@
 													"type": "machine"
 											}
 									],
-									"samples": []
+									"samples": [
+											"buy the {machine} ",
+											"get {machine}",
+											"buy {machine} "
+									]
 							},
 							{
 									"name": "AMAZON.NavigateHomeIntent",
