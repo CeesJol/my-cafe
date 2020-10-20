@@ -7,6 +7,15 @@ const randomIntFromInterval = (min, max) =>
 const randomId = () => Math.floor(Math.random() * 1e16);
 
 /**
+ * HINTS
+ */
+const HINTS = ["Some hint"];
+
+const getHint = () => {
+  return HINTS[Math.floor(Math.random() * HINTS.length)];
+};
+
+/**
  * MACHINES
  */
 const MACHINES = [
@@ -45,4 +54,5 @@ module.exports = {
   getMachine,
   MACHINES,
   getProfit,
+  getHint,
 };

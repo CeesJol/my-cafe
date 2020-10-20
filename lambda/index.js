@@ -12,7 +12,13 @@ const languageStrings = {
   en: require("./languageStrings"),
 };
 const AWS = require("aws-sdk");
-const { randomId, getMachine, MACHINES, getProfit } = require("./constants");
+const {
+  randomId,
+  getMachine,
+  MACHINES,
+  getProfit,
+  getHint,
+} = require("./constants");
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -42,7 +48,6 @@ const LaunchRequest = {
       gamesPlayed: 420,
       debug: false,
       week: 1,
-      money: 500,
       id: randomId(),
       ...attributes,
     };
@@ -53,9 +58,10 @@ const LaunchRequest = {
       attributes.gamesPlayed++;
     } else {
       // User has never played before, initialize a game for them
-      attributes.gameState = "INIT";
+      attributes.gameState = "PLAYING";
       attributes.gamesPlayed = 0;
-      attributes.money = 500;
+      attributes.wealth = 50;
+      attributes.popularity = 50;
       attributes.week = 1;
       attributes.machine = 0;
       attributes.level = 1;
@@ -216,128 +222,183 @@ const UnhandledIntent = {
   },
 };
 
-const BuyMachineIntent = {
-  canHandle(handlerInput) {
-    // handle buying machines only during a game, or when starting one
-    let isCurrentlyPlaying = false;
-    const { attributesManager } = handlerInput;
-    const sessionAttributes = attributesManager.getSessionAttributes();
+// const BuyMachineIntent = {
+//   canHandle(handlerInput) {
+//     // handle buying machines only during a game, or when starting one
+//     let isCurrentlyPlaying = false;
+//     const { attributesManager } = handlerInput;
+//     const sessionAttributes = attributesManager.getSessionAttributes();
 
-    if (
-      sessionAttributes.gameState &&
-      (sessionAttributes.gameState === "PLAYING" ||
-        sessionAttributes.gameState === "INIT")
-    ) {
-      isCurrentlyPlaying = true;
-    }
+//     if (
+//       sessionAttributes.gameState &&
+//       (sessionAttributes.gameState === "PLAYING" ||
+//         sessionAttributes.gameState === "INIT")
+//     ) {
+//       isCurrentlyPlaying = true;
+//     }
 
-    return (
-      isCurrentlyPlaying &&
-      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
-      Alexa.getIntentName(handlerInput.requestEnvelope) === "BuyMachineIntent"
-    );
-  },
-  async handle(handlerInput) {
-    const { attributesManager } = handlerInput;
-    const requestAttributes = attributesManager.getRequestAttributes();
-    const sessionAttributes = attributesManager.getSessionAttributes();
+//     return (
+//       isCurrentlyPlaying &&
+//       Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+//       Alexa.getIntentName(handlerInput.requestEnvelope) === "BuyMachineIntent"
+//     );
+//   },
+//   async handle(handlerInput) {
+//     const { attributesManager } = handlerInput;
+//     const requestAttributes = attributesManager.getRequestAttributes();
+//     const sessionAttributes = attributesManager.getSessionAttributes();
 
-    const machine = Alexa.getSlotValue(handlerInput.requestEnvelope, "machine");
-    console.log("machine:", machine);
-    const chosenMachine = getMachine(machine);
-    console.log("chosenMachine:", chosenMachine);
+//     const machine = Alexa.getSlotValue(handlerInput.requestEnvelope, "machine");
+//     console.log("machine:", machine);
+//     const chosenMachine = getMachine(machine);
+//     console.log("chosenMachine:", chosenMachine);
 
-    if (!chosenMachine) {
-      // Chosen machine is not recognized
+//     if (!chosenMachine) {
+//       // Chosen machine is not recognized
 
-      // Next machine purchasable
-      const nextMachine = MACHINES[sessionAttributes.machine];
+//       // Next machine purchasable
+//       const nextMachine = MACHINES[sessionAttributes.machine];
 
-      const speechOutput = requestAttributes.t(
-        "BUY_MACHINE_UNKNOWN",
-        nextMachine.name,
-        nextMachine.cost
-      );
+//       const speechOutput = requestAttributes.t(
+//         "BUY_MACHINE_UNKNOWN",
+//         nextMachine.name,
+//         nextMachine.cost
+//       );
 
-      return handlerInput.responseBuilder
-        .speak(speechOutput)
-        .reprompt(speechOutput)
-        .getResponse();
-    } else if (chosenMachine.cost > sessionAttributes.money) {
-      // Chosen machine is too expensive
+//       return handlerInput.responseBuilder
+//         .speak(speechOutput)
+//         .reprompt(speechOutput)
+//         .getResponse();
+//     } else if (chosenMachine.cost > sessionAttributes.money) {
+//       // Chosen machine is too expensive
 
-      const speechOutput = requestAttributes.t(
-        "BUY_MACHINE_CANT_AFFORD",
-        chosenMachine.name,
-        chosenMachine.cost,
-        sessionAttributes.money
-      );
+//       const speechOutput = requestAttributes.t(
+//         "BUY_MACHINE_CANT_AFFORD",
+//         chosenMachine.name,
+//         chosenMachine.cost,
+//         sessionAttributes.money
+//       );
 
-      return handlerInput.responseBuilder
-        .speak(speechOutput)
-        .reprompt(speechOutput)
-        .getResponse();
-    } else if (sessionAttributes.machine > MACHINES.indexOf(chosenMachine)) {
-      // User already has this machine
+//       return handlerInput.responseBuilder
+//         .speak(speechOutput)
+//         .reprompt(speechOutput)
+//         .getResponse();
+//     } else if (sessionAttributes.machine > MACHINES.indexOf(chosenMachine)) {
+//       // User already has this machine
 
-      // Next machine purchasable
-      const nextMachine = MACHINES[sessionAttributes.machine];
+//       // Next machine purchasable
+//       const nextMachine = MACHINES[sessionAttributes.machine];
 
-      const speechOutput = requestAttributes.t(
-        "BUY_MACHINE_ALREADY_PURCHASED",
-        chosenMachine.name,
-        nextMachine.name,
-        nextMachine.cost
-      );
+//       const speechOutput = requestAttributes.t(
+//         "BUY_MACHINE_ALREADY_PURCHASED",
+//         chosenMachine.name,
+//         nextMachine.name,
+//         nextMachine.cost
+//       );
 
-      return handlerInput.responseBuilder
-        .speak(speechOutput)
-        .reprompt(speechOutput)
-        .getResponse();
-    }
+//       return handlerInput.responseBuilder
+//         .speak(speechOutput)
+//         .reprompt(speechOutput)
+//         .getResponse();
+//     }
 
-    sessionAttributes.money -= chosenMachine.cost;
+//     sessionAttributes.money -= chosenMachine.cost;
 
-    try {
-      attributesManager.setPersistentAttributes(sessionAttributes);
-      await attributesManager.savePersistentAttributes();
-    } catch (e) {}
+//     try {
+//       attributesManager.setPersistentAttributes(sessionAttributes);
+//       await attributesManager.savePersistentAttributes();
+//     } catch (e) {}
 
-    if (sessionAttributes.week === 1 && sessionAttributes.machine === 0) {
-      // You bought the first machine, let's start the game!
-      sessionAttributes.gameState = "PLAYING";
-      sessionAttributes.machine++;
+//     if (sessionAttributes.week === 1 && sessionAttributes.machine === 0) {
+//       // You bought the first machine, let's start the game!
+//       sessionAttributes.gameState = "PLAYING";
+//       sessionAttributes.machine++;
 
-      const speechOutput = requestAttributes.t(
-        "START_MACHINE_CONFIRM",
-        sessionAttributes.money
-      );
+//       const speechOutput = requestAttributes.t(
+//         "START_MACHINE_CONFIRM",
+//         sessionAttributes.money
+//       );
 
-      return handlerInput.responseBuilder
-        .speak(speechOutput)
-        .reprompt(speechOutput)
-        .getResponse();
-    }
+//       return handlerInput.responseBuilder
+//         .speak(speechOutput)
+//         .reprompt(speechOutput)
+//         .getResponse();
+//     }
 
-    // Buy specific machine (not the first one)
-    sessionAttributes.machine++;
+//     // Buy specific machine (not the first one)
+//     sessionAttributes.machine++;
 
-    const speechOutput = requestAttributes.t(
-      "BUY_MACHINE_CONFIRM",
-      chosenMachine.name,
-      sessionAttributes.money
-    );
+//     const speechOutput = requestAttributes.t(
+//       "BUY_MACHINE_CONFIRM",
+//       chosenMachine.name,
+//       sessionAttributes.money
+//     );
 
-    console.log(sessionAttributes.machine, MACHINES.indexOf(chosenMachine));
+//     console.log(sessionAttributes.machine, MACHINES.indexOf(chosenMachine));
 
-    return handlerInput.responseBuilder
-      .speak(speechOutput)
-      .reprompt(speechOutput)
-      .getResponse();
-  },
-};
+//     return handlerInput.responseBuilder
+//       .speak(speechOutput)
+//       .reprompt(speechOutput)
+//       .getResponse();
+//   },
+// };
 
-const NextWeekIntent = {
+// const NextWeekIntent = {
+//   canHandle(handlerInput) {
+//     // handle next week intent only during a game
+//     let isCurrentlyPlaying = false;
+//     const { attributesManager } = handlerInput;
+//     const sessionAttributes = attributesManager.getSessionAttributes();
+
+//     if (
+//       sessionAttributes.gameState &&
+//       sessionAttributes.gameState === "PLAYING"
+//     ) {
+//       isCurrentlyPlaying = true;
+//     }
+
+//     return (
+//       isCurrentlyPlaying &&
+//       Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+//       Alexa.getIntentName(handlerInput.requestEnvelope) === "NextWeekIntent"
+//     );
+//   },
+//   async handle(handlerInput) {
+//     const { attributesManager } = handlerInput;
+//     const requestAttributes = attributesManager.getRequestAttributes();
+//     const sessionAttributes = attributesManager.getSessionAttributes();
+
+//     sessionAttributes.week++;
+
+//     try {
+//       attributesManager.setPersistentAttributes(sessionAttributes);
+//       await attributesManager.savePersistentAttributes();
+//     } catch (e) {}
+
+//     const profit = getProfit(
+//       sessionAttributes.level,
+//       sessionAttributes.machine
+//     );
+//     console.log("profit:", profit);
+//     sessionAttributes.money += profit;
+
+//     const speechOutput = requestAttributes.t(
+//       "WEEK_TURN",
+//       sessionAttributes.week,
+//       profit,
+//       sessionAttributes.money,
+//       "Some event",
+//       "Some hint"
+//     );
+
+//     return handlerInput.responseBuilder
+//       .speak(speechOutput)
+//       .reprompt(speechOutput)
+//       .getResponse();
+//   },
+// };
+
+const IncreasePricesIntent = {
   canHandle(handlerInput) {
     // handle next week intent only during a game
     let isCurrentlyPlaying = false;
@@ -362,27 +423,58 @@ const NextWeekIntent = {
     const requestAttributes = attributesManager.getRequestAttributes();
     const sessionAttributes = attributesManager.getSessionAttributes();
 
+    // Take turn
     sessionAttributes.week++;
+    sessionAttributes.wealth += 10;
+    sessionAttributes.popularity -= 10;
+    let w = "increased";
+    let p = "decreased;";
+
+    let hint;
+
+    if (sessionAttributes.popularity < 0) {
+      // User is game over:
+      sessionAttributes.gameState = "GAME_OVER";
+
+      try {
+        attributesManager.setPersistentAttributes(sessionAttributes);
+        await attributesManager.savePersistentAttributes();
+      } catch (e) {}
+
+      const speechOutput = requestAttributes.t(
+        "GAME_OVER_POPULARITY",
+        sessionAttributes.week
+      );
+
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .reprompt(speechOutput)
+        .getResponse();
+    } else if (sessionAttributes.wealth > 100) {
+      // User will have to pay taxes now
+      hint =
+        "Your wealth has exceeded 100. This is no problem, but you will have to start paying taxes now.";
+    } else {
+      hint = getHint();
+    }
 
     try {
       attributesManager.setPersistentAttributes(sessionAttributes);
       await attributesManager.savePersistentAttributes();
     } catch (e) {}
 
-    const profit = getProfit(
-      sessionAttributes.level,
-      sessionAttributes.machine
-    );
-    console.log("profit:", profit);
-    sessionAttributes.money += profit;
-
     const speechOutput = requestAttributes.t(
       "WEEK_TURN",
-      sessionAttributes.week,
-      profit,
-      sessionAttributes.money,
+      "You increased your prices for this week, which increased your wealth by 10 but decreased your popularity by 10.",
+      w,
+      10,
+      sessionAttributes.wealth,
+      p,
+      10,
+      sessionAttributes.popularity,
       "Some event",
-      "Some hint"
+      "Some event explanation",
+      hint
     );
 
     return handlerInput.responseBuilder
@@ -497,7 +589,7 @@ exports.handler = skillBuilder
     HelpIntent,
     YesIntent,
     NoIntent,
-    BuyMachineIntent,
+    // BuyMachineIntent,
     NextWeekIntent,
     FallbackHandler,
     UnhandledIntent

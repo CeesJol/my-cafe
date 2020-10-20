@@ -59,6 +59,46 @@
 											"take turn",
 											"next week"
 									]
+							},
+							{
+									"name": "IncreasePricesIntent",
+									"slots": [],
+									"samples": [
+											"increase price",
+											"increase prices"
+									]
+							},
+							{
+									"name": "DecreasePricesIntent",
+									"slots": [],
+									"samples": [
+											"lower the prices",
+											"add sales",
+											"decrease price",
+											"decrease prices"
+									]
+							},
+							{
+									"name": "AdvertizeIntent",
+									"slots": [],
+									"samples": [
+											"make commercials",
+											"ads",
+											"create ads",
+											"advertize"
+									]
+							},
+							{
+									"name": "PromoteIntent",
+									"slots": [
+											{
+													"name": "item",
+													"type": "item"
+											}
+									],
+									"samples": [
+											"promote {item}"
+									]
 							}
 					],
 					"types": [
@@ -93,6 +133,24 @@
 											{
 													"name": {
 															"value": "coffee machine"
+													}
+											}
+									]
+							},
+							{
+									"name": "item",
+									"values": [
+											{
+													"name": {
+															"value": "cold drinks"
+													}
+											},
+											{
+													"name": {
+															"value": "hot drinks",
+															"synonyms": [
+																	"warm drinks"
+															]
 													}
 											}
 									]
