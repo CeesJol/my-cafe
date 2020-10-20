@@ -6,53 +6,108 @@ const randomIntFromInterval = (min, max) =>
 
 const randomId = () => Math.floor(Math.random() * 1e16);
 
+const PRICE_INFLUENCE = 10; // Amount wealth/popularity fluctuates by increasing and decreasing price
+
 /**
  * HINTS
  */
-const HINTS = ["Some hint"];
+const HINTS = [
+  "Promoting the right drinks at the right weather conditions leads to more sales.",
+  "Festivals bring many thirsty people from far away to town.",
+  "Sales will always be worse during holidays.",
+  "New cafes often compete by offering lower prices.",
+  "",
+];
 
-const getHint = () => {
+const getHint = (week) => {
+  // Only give hint every other week
+  if (week % 2 == 0) return "";
   return HINTS[Math.floor(Math.random() * HINTS.length)];
 };
 
 /**
- * MACHINES
+ * EVENTS
  */
-const MACHINES = [
+const EVENTS_ACTIONS_MATRIX = [
   {
-    name: "Coffee machine",
-    cost: 100,
+    description: "A festival will be in town this week.",
+    actions: {
+      // Good
+      increase: {
+        wealth: 20,
+        popularity: -5,
+      },
+      // Good
+      advertize: {
+        wealth: -5,
+        popularity: 20,
+      },
+    },
   },
   {
-    name: "Tea machine",
-    cost: 200,
+    description: "There are holidays this week.",
+    actions: {
+      // Good
+      decrease: {
+        wealth: 20,
+        popularity: -5,
+      },
+      // Bad
+      advertize: {
+        wealth: -10,
+        popularity: 2,
+      },
+    },
   },
   {
-    name: "Latte machine",
-    cost: 9001,
+    description: "Bad news: new competition has arrived to the town.",
+    actions: {
+      // Good
+      decrease: {
+        wealth: -10,
+        popularity: 10,
+      },
+    },
+    // Bad. This overwrites the default rewards
+    overwrite: {
+      wealth: -20,
+      popularity: -5,
+    },
+  },
+  {
+    description: "Cold, rainy weather is predicted for this week.",
+    actions: {
+      // Good
+      "promote-hot": {
+        wealth: 20,
+        popularity: 5,
+      },
+    },
+  },
+  {
+    description: "Sunny weather is predicted for this week.",
+    actions: {
+      // Good
+      "promote-cold": {
+        wealth: 20,
+        popularity: 5,
+      },
+    },
+  },
+  {
+    description:
+      "Locals are calling it cucumber time. There is nothing happening this week.",
+    actions: {},
   },
 ];
 
-const getMachine = (machine) => {
-  const result = MACHINES.find(
-    (m) => m.name.toLowerCase() === machine.toLowerCase()
-  );
-  return result;
-};
-
-/**
- * PROFITS
- */
-const PROFIT_MIN = 100;
-const PROFIT_MAX = 200;
-const getProfit = (level, machine) => {
-  return level * machine * randomIntFromInterval(PROFIT_MIN, PROFIT_MAX);
+const getEvent = (week) => {
+  return EVENTS_ACTIONS_MATRIX[(week - 2) % EVENTS_ACTIONS_MATRIX.length];
 };
 
 module.exports = {
   randomId,
-  getMachine,
-  MACHINES,
-  getProfit,
   getHint,
+  PRICE_INFLUENCE,
+  getEvent,
 };

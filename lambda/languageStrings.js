@@ -30,13 +30,13 @@ module.exports = {
     // - amount change
     // - new value
     // - event
-    // - event explanation
     // - hint
     WEEK_TURN: `%s 
 		Your wealth %s by %s, to %s.
 		Your popularity %s by %s, to %s.
-		Next week, %s. %s
-		%s`,
+		%s
+		%s
+		What action would you like to take?`,
     BIG_OOF: "Big oof!",
     // Buying a machine
     BUY_MACHINE_CONFIRM: `Great! You bought %s. You have %s dollars left. ${NEXT_WEEK}`,
