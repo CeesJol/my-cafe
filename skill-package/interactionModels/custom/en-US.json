@@ -1,7 +1,7 @@
 {
 	"interactionModel": {
 			"languageModel": {
-					"invocationName": "my cafeteria",
+					"invocationName": "my cafe",
 					"modelConfiguration": {
 							"fallbackIntentSensitivity": {
 									"level": "LOW"
