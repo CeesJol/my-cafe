@@ -12,7 +12,7 @@ const languageStrings = {
   en: require("./languageStrings"),
 };
 const AWS = require("aws-sdk");
-const { getMachine, MACHINES, getProfit } = require("./constants");
+const { randomId, getMachine, MACHINES, getProfit } = require("./constants");
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -43,6 +43,7 @@ const LaunchRequest = {
       debug: false,
       week: 1,
       money: 500,
+      id: randomId(),
       ...attributes,
     };
 

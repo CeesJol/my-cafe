@@ -4,6 +4,8 @@
 const randomIntFromInterval = (min, max) =>
   Math.floor(Math.random() * (max - min + 1) + min);
 
+const randomId = () => Math.floor(Math.random() * 1e16);
+
 /**
  * MACHINES
  */
@@ -39,6 +41,7 @@ const getProfit = (level, machine) => {
 };
 
 module.exports = {
+  randomId,
   getMachine,
   MACHINES,
   getProfit,
