@@ -99,6 +99,19 @@
 									"samples": [
 											"promote {item}"
 									]
+							},
+							{
+									"name": "PromoteHelpIntent",
+									"slots": [],
+									"samples": [
+											"can I promote",
+											"how do I promote",
+											"what is promoting",
+											"what to promote",
+											"what can I promote",
+											"which item to promote",
+											"which items can I promote"
+									]
 							}
 					],
 					"types": [

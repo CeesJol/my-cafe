@@ -19,6 +19,8 @@ const {
   getResults,
   getActionExplanation,
   NUMBER_OF_EVENTS,
+  getCTA,
+  createAttributes,
 } = require("./constants");
 
 const LaunchRequest = {
@@ -42,40 +44,48 @@ const LaunchRequest = {
       };
     }
 
-    let letMeStartOver = true;
+    let letMeStartOver = false;
 
     attributes = {
       // Initialize attributes for first open
-      gamesPlayed: 420,
+      gamesPlayed: 0,
       debug: false,
       week: 1,
       id: randomId(),
       ...attributes,
     };
 
-    if (attributes.gamesPlayed > 0 && !letMeStartOver) {
-      // User has played before, get them right into the game
+    // Shorten the output if debugging
+    let speechOutput;
+    if (attributes.week > 1) {
+      // Ask user to continue if they still have an open game
       attributes.gameState = "CONTINUE_OR_NEW";
-      attributes.gamesPlayed++;
-    } else {
-      // User has never played before, initialize a game for them
+      speechOutput = requestAttributes.t(
+        "LAUNCH_MESSAGE_CONTINUE_OR_NEW",
+        attributes.highScore
+      );
+    } else if (attributes.gamesPlayed === 0) {
+      // Initialisation message if you haven't played yet
+      speechOutput = requestAttributes.t("LAUNCH_MESSAGE_FIRST_OPEN");
       attributes.gameState = "PLAYING";
-      attributes.gamesPlayed = 0;
-      attributes.wealth = 50;
-      attributes.popularity = 50;
-      attributes.action = "";
-      attributes.week = 1;
-      attributes.level = 1;
+      attributes = {
+        ...attributes,
+        ...createAttributes(),
+      };
+    } else {
+      // Create a new game for an existing user
+      speechOutput = requestAttributes.t(
+        "LAUNCH_MESSAGE_NEW_GAME",
+        attributes.highScore
+      );
+      attributes.gameState = "PLAYING";
+      attributes = {
+        ...attributes,
+        ...createAttributes(),
+      };
     }
 
     attributesManager.setSessionAttributes(attributes);
-
-    // Initialisation message if you haven't played yet
-    // Shorten the output if debugging
-    let speechOutput = requestAttributes.t(
-      (attributes.gamesPlayed === 0 ? "START_EMPLOYEE" : "LAUNCH_MESSAGE") +
-        (attributes ? "_DEV" : "")
-    );
 
     return handlerInput.responseBuilder
       .speak(speechOutput)
@@ -211,6 +221,27 @@ const NoIntent = {
   },
 };
 
+const PromoteHelpIntent = {
+  canHandle(handlerInput) {
+    return (
+      Alexa.getRequestType(handlerInput.requestEnvelope) ===
+        "PromoteHelpRequest" &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.NoIntent"
+    );
+  },
+  async handle(handlerInput) {
+    const { attributesManager } = handlerInput;
+    const requestAttributes = attributesManager.getRequestAttributes();
+
+    const speechOutput = requestAttributes.t("PROMOTE_ITEM_EXPLANATION");
+
+    return handlerInput.responseBuilder
+      .speak(speechOutput)
+      .reprompt(speechOutput)
+      .getResponse();
+  },
+};
+
 const UnhandledIntent = {
   canHandle() {
     return true;
@@ -250,15 +281,28 @@ const handleAction = async (handlerInput, action) => {
   const requestAttributes = attributesManager.getRequestAttributes();
   const sessionAttributes = attributesManager.getSessionAttributes();
 
+  if (action === "promote-unknown") {
+    // User wanted to promote item, but the item is not recognized
+    const speechOutput = requestAttributes.t("PROMOTE_ITEM_NOT_RECOGNIZED");
+
+    return handlerInput.responseBuilder
+      .speak(speechOutput)
+      .reprompt(speechOutput)
+      .getResponse();
+  }
+
   let event = getEvent(sessionAttributes.week);
   let hint = sessionAttributes.week <= NUMBER_OF_EVENTS ? event.hint || "" : ""; // Only give event in first few weeks
+  let warning = "";
   let isRepeat = false;
   if (sessionAttributes.action === action) {
     isRepeat = true;
     hint = "Warning: repeating the same actions reduces it's effects.";
   }
+  let CTA = getCTA(sessionAttributes.week);
 
   // Reward is based on event from past week
+  console.log("action:", action);
   let reward = getResults(action, sessionAttributes.week - 1, isRepeat);
   console.log("reward:", reward);
 
@@ -273,6 +317,8 @@ const handleAction = async (handlerInput, action) => {
 
   if (sessionAttributes.popularity < 0 || sessionAttributes.wealth < 0) {
     // User is game over:
+    sessionAttributes.gamesPlayed++;
+    sessionAttributes.highScore = sessionAttributes.week;
     sessionAttributes.gameState = "GAME_OVER";
 
     try {
@@ -291,10 +337,19 @@ const handleAction = async (handlerInput, action) => {
       .speak(speechOutput)
       .reprompt(speechOutput)
       .getResponse();
-  } else if (sessionAttributes.wealth > 100) {
+  } else if (
+    sessionAttributes.wealth > 100 &&
+    sessionAttributes.wealth - reward.wealth < 100
+  ) {
     // User will have to pay taxes now
-    hint =
+    warning =
       "Your wealth has exceeded 100. This is no problem, but you will have to start paying taxes now.";
+  } else if (
+    sessionAttributes.popularity > 100 &&
+    sessionAttributes.popularity - reward.popularity < 100
+  ) {
+    // User will have to pay taxes now
+    warning = "Your popularity is at it's maximum: 100.";
   }
 
   try {
@@ -311,8 +366,10 @@ const handleAction = async (handlerInput, action) => {
     p,
     Math.abs(reward.popularity),
     sessionAttributes.popularity,
+    warning,
     event.description,
-    hint
+    hint,
+    CTA
   );
 
   return handlerInput.responseBuilder
@@ -363,6 +420,9 @@ const PromoteIntent = {
       case "hot drinks":
         action += "hot";
         break;
+      default:
+        // This item does not exist
+        action += "unknown";
     }
     return handleAction(handlerInput, action);
   },
@@ -473,6 +533,7 @@ exports.handler = skillBuilder
     HelpIntent,
     YesIntent,
     NoIntent,
+    PromoteHelpIntent,
     IncreasePricesIntent,
     DecreasePricesIntent,
     AdvertizeIntent,

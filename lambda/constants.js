@@ -61,7 +61,7 @@ const EVENTS_ACTIONS_MATRIX = [
     },
   },
   {
-    description: "Cold, rainy weather is predicted for this week.",
+    description: "Cold and rainy weather is predicted for this week.",
     actions: {
       // Good
       "promote-hot": {
@@ -143,8 +143,8 @@ const getResults = (action, week, isRepeat) => {
     if (action === "decrease") {
       // You should start with this action, so reward it
       return {
-        wealth: 20,
-        popularity: -10,
+        wealth: -10,
+        popularity: 20,
       };
     } else {
       return ACTIONS[action];
@@ -175,6 +175,33 @@ const getResults = (action, week, isRepeat) => {
   return reward;
 };
 
+/**
+ * CALL TO ACTION
+ */
+const getCTA = (week) => {
+  // Explain the actions
+  if (week % 2 === 0 && week < 10)
+    return `
+			Each week, you can take one action: increase prices, decrease prices, advertize, or promote an item. You can promote either hot or cold drinks.
+			Which action would you like to take?`;
+
+  return "Which action would you like to take?";
+};
+
+/**
+ * SESSION ATTRIBUTES
+ */
+const createAttributes = () => {
+  return {
+    gameState: "PLAYING",
+    wealth: 50,
+    popularity: 50,
+    action: "",
+    week: 1,
+    level: 1,
+  };
+};
+
 module.exports = {
   randomId,
   PRICE_INFLUENCE,
@@ -182,4 +209,6 @@ module.exports = {
   getResults,
   getActionExplanation,
   NUMBER_OF_EVENTS,
+  getCTA,
+  createAttributes,
 };
