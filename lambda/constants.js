@@ -133,9 +133,9 @@ const getActionExplanation = (action) => {
     case "advertize":
       return "You advertized this week, which decreased your wealth.";
     case "promote-cold":
-      return "You promoted cold drinks this week, which increased your wealth but decreased your wealth.";
+      return "You promoted cold drinks this week, which increased your wealth but decreased your popularity.";
     case "promote-hot":
-      return "You promoted hot drinks this week, which increased your wealth but decreased your wealth.";
+      return "You promoted hot drinks this week, which increased your wealth but decreased your popularity.";
     default:
       return "";
   }
@@ -148,16 +148,28 @@ const getEvent = (week) => {
 const getResults = (action, week, isRepeat) => {
   console.log("week:", week);
   console.log("getEvent(week):", getEvent(week));
+  if (week === 0) {
+    // The first week has no event yet
+    if (action === "decrease") {
+      // You should start with this action, so reward it
+      return {
+        wealth: 20,
+        popularity: -10,
+      };
+    } else {
+      return ACTIONS[action];
+    }
+  }
   const event = getEvent(week).actions;
   let reward;
 
   if (event[action]) {
     // Special result for this action is available
-    // This is a reward for a suitable action
+    // This is usually a reward for a suitable action
     reward = event[action];
   } else if (event["any"]) {
     // Special result for this event, but no specific action above, is available
-    // This is a punishment for an unsuitable action
+    // This is usually a punishment for an unsuitable action
     reward = event["any"];
   } else {
     reward = ACTIONS[action];

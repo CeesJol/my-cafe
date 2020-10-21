@@ -251,14 +251,14 @@ const handleAction = async (handlerInput, action) => {
   const sessionAttributes = attributesManager.getSessionAttributes();
 
   let hint = getHint(sessionAttributes.week);
-  let event = getEvent(sessionAttributes.week);
+  let event = getEvent(sessionAttributes.week); // Event from past week
   let isRepeat = false;
   if (sessionAttributes.action === action) {
     isRepeat = true;
     hint = "Warning: repeating the same actions reduces it's effects.";
   }
 
-  let reward = getResults(action, sessionAttributes.week, isRepeat);
+  let reward = getResults(action, sessionAttributes.week - 1, isRepeat);
   console.log("reward:", reward);
 
   sessionAttributes.action = action;
@@ -335,6 +335,35 @@ const DecreasePricesIntent = {
   },
   async handle(handlerInput) {
     return handleAction(handlerInput, "decrease");
+  },
+};
+
+const AdvertizeIntent = {
+  canHandle(handlerInput) {
+    return canHandleInGame(handlerInput, "AdvertizeIntent");
+  },
+  async handle(handlerInput) {
+    return handleAction(handlerInput, "advertize");
+  },
+};
+
+const PromoteIntent = {
+  canHandle(handlerInput) {
+    return canHandleInGame(handlerInput, "PromoteIntent");
+  },
+  async handle(handlerInput) {
+    // Get chosen promoted drink
+    const item = Alexa.getSlotValue(handlerInput.requestEnvelope, "item");
+    let action = "promote-";
+    switch (item) {
+      case "cold drinks":
+        action += "cold";
+        break;
+      case "hot drinks":
+        action += "hot";
+        break;
+    }
+    return handleAction(handlerInput, action);
   },
 };
 
@@ -445,6 +474,8 @@ exports.handler = skillBuilder
     NoIntent,
     IncreasePricesIntent,
     DecreasePricesIntent,
+    AdvertizeIntent,
+    PromoteIntent,
     FallbackHandler,
     UnhandledIntent
   )
