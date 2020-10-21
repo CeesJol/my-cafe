@@ -14,11 +14,11 @@ const languageStrings = {
 const AWS = require("aws-sdk");
 const {
   randomId,
-  getHint,
   PRICE_INFLUENCE,
   getEvent,
   getResults,
   getActionExplanation,
+  NUMBER_OF_EVENTS,
 } = require("./constants");
 
 const LaunchRequest = {
@@ -250,14 +250,15 @@ const handleAction = async (handlerInput, action) => {
   const requestAttributes = attributesManager.getRequestAttributes();
   const sessionAttributes = attributesManager.getSessionAttributes();
 
-  let hint = getHint(sessionAttributes.week);
-  let event = getEvent(sessionAttributes.week); // Event from past week
+  let event = getEvent(sessionAttributes.week);
+  let hint = sessionAttributes.week <= NUMBER_OF_EVENTS ? event.hint || "" : ""; // Only give event in first few weeks
   let isRepeat = false;
   if (sessionAttributes.action === action) {
     isRepeat = true;
     hint = "Warning: repeating the same actions reduces it's effects.";
   }
 
+  // Reward is based on event from past week
   let reward = getResults(action, sessionAttributes.week - 1, isRepeat);
   console.log("reward:", reward);
 

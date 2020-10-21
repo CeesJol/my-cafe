@@ -9,28 +9,12 @@ const randomId = () => Math.floor(Math.random() * 1e16);
 const PRICE_INFLUENCE = 10; // Amount wealth/popularity fluctuates by increasing and decreasing price
 
 /**
- * HINTS
- */
-const HINTS = [
-  "Promoting the right drinks at the right weather conditions leads to more sales.",
-  "Festivals bring many thirsty people from far away to town.",
-  "Sales will always be worse during holidays.",
-  "New cafes often compete by offering lower prices.",
-  "",
-];
-
-const getHint = (week) => {
-  // Only give hint every other week
-  if (week % 2 == 0) return "";
-  return HINTS[Math.floor(Math.random() * HINTS.length)];
-};
-
-/**
  * EVENTS AND ACTIONS
  */
 const EVENTS_ACTIONS_MATRIX = [
   {
     description: "A festival will be in town this week.",
+    hint: "Festivals bring many thirsty people from far away to town.",
     actions: {
       // Good
       increase: {
@@ -46,6 +30,7 @@ const EVENTS_ACTIONS_MATRIX = [
   },
   {
     description: "There are holidays this week.",
+    hint: "Sales will always be worse during holidays.",
     actions: {
       // Good
       decrease: {
@@ -61,6 +46,7 @@ const EVENTS_ACTIONS_MATRIX = [
   },
   {
     description: "Bad news: new competition has arrived to the town.",
+    hint: "New cafes often compete by offering lower prices.",
     actions: {
       // Good
       decrease: {
@@ -86,6 +72,8 @@ const EVENTS_ACTIONS_MATRIX = [
   },
   {
     description: "Sunny weather is predicted for this week.",
+    hint:
+      "Promoting the right drinks at the right weather conditions leads to more sales.",
     actions: {
       // Good
       "promote-cold": {
@@ -100,6 +88,8 @@ const EVENTS_ACTIONS_MATRIX = [
     actions: {},
   },
 ];
+
+const NUMBER_OF_EVENTS = EVENTS_ACTIONS_MATRIX.length;
 
 const ACTIONS = {
   increase: {
@@ -187,9 +177,9 @@ const getResults = (action, week, isRepeat) => {
 
 module.exports = {
   randomId,
-  getHint,
   PRICE_INFLUENCE,
   getEvent,
   getResults,
   getActionExplanation,
+  NUMBER_OF_EVENTS,
 };
