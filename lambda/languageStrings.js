@@ -21,6 +21,8 @@ module.exports = {
     // Game over
     GAME_OVER_POPULARITY:
       "Your popularity went below zero. Your landlord is not happy with you anymore and has decided to kick you out. Your final score is: %s. Would you like to play again?",
+    GAME_OVER_WEALTH:
+      "Your wealth went below zero, which means you went bankrupt. Your final score is: %s. Would you like to play again?",
     // Week turn
     // - action and result
     // - increase/decrease
@@ -36,7 +38,7 @@ module.exports = {
 		Your popularity %s by %s, to %s.
 		%s
 		%s
-		What action would you like to take?`,
+		Which action would you like to take?`,
     BIG_OOF: "Big oof!",
     // Buying a machine
     BUY_MACHINE_CONFIRM: `Great! You bought %s. You have %s dollars left. ${NEXT_WEEK}`,

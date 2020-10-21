@@ -26,7 +26,7 @@ const getHint = (week) => {
 };
 
 /**
- * EVENTS
+ * EVENTS AND ACTIONS
  */
 const EVENTS_ACTIONS_MATRIX = [
   {
@@ -69,7 +69,7 @@ const EVENTS_ACTIONS_MATRIX = [
       },
     },
     // Bad. This overwrites the default rewards
-    overwrite: {
+    any: {
       wealth: -20,
       popularity: -5,
     },
@@ -101,8 +101,76 @@ const EVENTS_ACTIONS_MATRIX = [
   },
 ];
 
+const ACTIONS = {
+  increase: {
+    wealth: PRICE_INFLUENCE,
+    popularity: -PRICE_INFLUENCE,
+  },
+  decrease: {
+    wealth: -PRICE_INFLUENCE,
+    popularity: PRICE_INFLUENCE,
+  },
+  advertize: {
+    wealth: -PRICE_INFLUENCE,
+    popularity: 0,
+  },
+  "promote-hot": {
+    wealth: PRICE_INFLUENCE / 2,
+    popularity: -PRICE_INFLUENCE / 2,
+  },
+  "promote-cold": {
+    wealth: PRICE_INFLUENCE / 2,
+    popularity: -PRICE_INFLUENCE / 2,
+  },
+};
+
+const getActionExplanation = (action) => {
+  switch (action) {
+    case "increase":
+      return "You increased your prices for this week, which increased your wealth but decreased your popularity.";
+    case "decrease":
+      return "You decreased your prices for this week, which decreased your wealth but increased your popularity.";
+    case "advertize":
+      return "You advertized this week, which decreased your wealth.";
+    case "promote-cold":
+      return "You promoted cold drinks this week, which increased your wealth but decreased your wealth.";
+    case "promote-hot":
+      return "You promoted hot drinks this week, which increased your wealth but decreased your wealth.";
+    default:
+      return "";
+  }
+};
+
 const getEvent = (week) => {
-  return EVENTS_ACTIONS_MATRIX[(week - 2) % EVENTS_ACTIONS_MATRIX.length];
+  return EVENTS_ACTIONS_MATRIX[(week - 1) % EVENTS_ACTIONS_MATRIX.length];
+};
+
+const getResults = (action, week, isRepeat) => {
+  console.log("week:", week);
+  console.log("getEvent(week):", getEvent(week));
+  const event = getEvent(week).actions;
+  let reward;
+
+  if (event[action]) {
+    // Special result for this action is available
+    // This is a reward for a suitable action
+    reward = event[action];
+  } else if (event["any"]) {
+    // Special result for this event, but no specific action above, is available
+    // This is a punishment for an unsuitable action
+    reward = event["any"];
+  } else {
+    reward = ACTIONS[action];
+  }
+
+  // Halven the positive rewards if it is a repeat action
+  if (isRepeat) {
+    if (reward.wealth > 0) reward.wealth = Math.floor(reward.wealth / 2);
+    if (reward.popularity > 0)
+      reward.popularity = Math.floor(reward.popularity / 2);
+  }
+
+  return reward;
 };
 
 module.exports = {
@@ -110,4 +178,6 @@ module.exports = {
   getHint,
   PRICE_INFLUENCE,
   getEvent,
+  getResults,
+  getActionExplanation,
 };

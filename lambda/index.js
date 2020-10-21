@@ -12,7 +12,14 @@ const languageStrings = {
   en: require("./languageStrings"),
 };
 const AWS = require("aws-sdk");
-const { randomId, getHint, PRICE_INFLUENCE, getEvent } = require("./constants");
+const {
+  randomId,
+  getHint,
+  PRICE_INFLUENCE,
+  getEvent,
+  getResults,
+  getActionExplanation,
+} = require("./constants");
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -218,75 +225,54 @@ const UnhandledIntent = {
   },
 };
 
-const IncreasePricesIntent = {
-  canHandle(handlerInput) {
-    // handle next week intent only during a game
-    let isCurrentlyPlaying = false;
-    const { attributesManager } = handlerInput;
-    const sessionAttributes = attributesManager.getSessionAttributes();
+const canHandleInGame = (handlerInput, intentName) => {
+  // handle action intent only during a game
+  let isCurrentlyPlaying = false;
+  const { attributesManager } = handlerInput;
+  const sessionAttributes = attributesManager.getSessionAttributes();
 
-    if (
-      sessionAttributes.gameState &&
-      sessionAttributes.gameState === "PLAYING"
-    ) {
-      isCurrentlyPlaying = true;
-    }
+  if (
+    sessionAttributes.gameState &&
+    sessionAttributes.gameState === "PLAYING"
+  ) {
+    isCurrentlyPlaying = true;
+  }
 
-    return (
-      isCurrentlyPlaying &&
-      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
-      Alexa.getIntentName(handlerInput.requestEnvelope) ===
-        "IncreasePricesIntent"
-    );
-  },
-  async handle(handlerInput) {
-    const { attributesManager } = handlerInput;
-    const requestAttributes = attributesManager.getRequestAttributes();
-    const sessionAttributes = attributesManager.getSessionAttributes();
+  return (
+    isCurrentlyPlaying &&
+    Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+    Alexa.getIntentName(handlerInput.requestEnvelope) === intentName
+  );
+};
 
-    let hint = getHint(sessionAttributes.week);
-    let event = getEvent(sessionAttributes.week);
+const handleAction = async (handlerInput, action) => {
+  const { attributesManager } = handlerInput;
+  const requestAttributes = attributesManager.getRequestAttributes();
+  const sessionAttributes = attributesManager.getSessionAttributes();
 
-    let repeatedAction = false;
-    if (sessionAttributes.action === "increase") {
-      repeatedAction = true;
-      hint = "Warning: repeating the same actions reduces it's effects.";
-    }
+  let hint = getHint(sessionAttributes.week);
+  let event = getEvent(sessionAttributes.week);
+  let isRepeat = false;
+  if (sessionAttributes.action === action) {
+    isRepeat = true;
+    hint = "Warning: repeating the same actions reduces it's effects.";
+  }
 
-    sessionAttributes.action = "increase";
+  let reward = getResults(action, sessionAttributes.week, isRepeat);
+  console.log("reward:", reward);
 
-    // Take turn
-    sessionAttributes.week++;
-    sessionAttributes.wealth += repeatAction
-      ? PRICE_INFLUENCE
-      : PRICE_INFLUENCE / 2;
-    sessionAttributes.popularity -= PRICE_INFLUENCE;
-    let w = "increased";
-    let p = "decreased";
+  sessionAttributes.action = action;
 
-    if (sessionAttributes.popularity < 0) {
-      // User is game over:
-      sessionAttributes.gameState = "GAME_OVER";
+  // Take turn
+  sessionAttributes.week++;
+  sessionAttributes.wealth += reward.wealth;
+  sessionAttributes.popularity += reward.popularity;
+  let w = reward.wealth < 0 ? "decreased" : "increased";
+  let p = reward.popularity < 0 ? "decreased" : "increased";
 
-      try {
-        attributesManager.setPersistentAttributes(sessionAttributes);
-        await attributesManager.savePersistentAttributes();
-      } catch (e) {}
-
-      const speechOutput = requestAttributes.t(
-        "GAME_OVER_POPULARITY",
-        sessionAttributes.week
-      );
-
-      return handlerInput.responseBuilder
-        .speak(speechOutput)
-        .reprompt(speechOutput)
-        .getResponse();
-    } else if (sessionAttributes.wealth > 100) {
-      // User will have to pay taxes now
-      hint =
-        "Your wealth has exceeded 100. This is no problem, but you will have to start paying taxes now.";
-    }
+  if (sessionAttributes.popularity < 0 || sessionAttributes.wealth < 0) {
+    // User is game over:
+    sessionAttributes.gameState = "GAME_OVER";
 
     try {
       attributesManager.setPersistentAttributes(sessionAttributes);
@@ -294,22 +280,61 @@ const IncreasePricesIntent = {
     } catch (e) {}
 
     const speechOutput = requestAttributes.t(
-      "WEEK_TURN",
-      "You increased your prices for this week, which increased your wealth but decreased your popularity.",
-      w,
-      PRICE_INFLUENCE,
-      sessionAttributes.wealth,
-      p,
-      PRICE_INFLUENCE,
-      sessionAttributes.popularity,
-      event.description,
-      hint
+      "GAME_OVER_" + (sessionAttributes.popularity < 0)
+        ? "POPULARITY"
+        : "WEALTH",
+      sessionAttributes.week
     );
 
     return handlerInput.responseBuilder
       .speak(speechOutput)
       .reprompt(speechOutput)
       .getResponse();
+  } else if (sessionAttributes.wealth > 100) {
+    // User will have to pay taxes now
+    hint =
+      "Your wealth has exceeded 100. This is no problem, but you will have to start paying taxes now.";
+  }
+
+  try {
+    attributesManager.setPersistentAttributes(sessionAttributes);
+    await attributesManager.savePersistentAttributes();
+  } catch (e) {}
+
+  const speechOutput = requestAttributes.t(
+    "WEEK_TURN",
+    getActionExplanation(action),
+    w,
+    Math.abs(reward.wealth),
+    sessionAttributes.wealth,
+    p,
+    Math.abs(reward.popularity),
+    sessionAttributes.popularity,
+    event.description,
+    hint
+  );
+
+  return handlerInput.responseBuilder
+    .speak(speechOutput)
+    .reprompt(speechOutput)
+    .getResponse();
+};
+
+const IncreasePricesIntent = {
+  canHandle(handlerInput) {
+    return canHandleInGame(handlerInput, "IncreasePricesIntent");
+  },
+  async handle(handlerInput) {
+    return handleAction(handlerInput, "increase");
+  },
+};
+
+const DecreasePricesIntent = {
+  canHandle(handlerInput) {
+    return canHandleInGame(handlerInput, "DecreasePricesIntent");
+  },
+  async handle(handlerInput) {
+    return handleAction(handlerInput, "decrease");
   },
 };
 
@@ -419,6 +444,7 @@ exports.handler = skillBuilder
     YesIntent,
     NoIntent,
     IncreasePricesIntent,
+    DecreasePricesIntent,
     FallbackHandler,
     UnhandledIntent
   )
