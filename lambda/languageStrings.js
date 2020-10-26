@@ -72,7 +72,8 @@ module.exports = {
     HELP_MESSAGE:
       "I am thinking of a number between zero and one hundred, try to guess it and I will tell you if it is higher or lower.",
     ERROR_MESSAGE: "Sorry, an error occurred.",
-    YES_MESSAGE: "Great! Try saying a number to start the game.",
+    YES_MESSAGE:
+      "Great! You can increase prices, decrease prices, advertize, or promote an item. Which action would you like to take?",
   },
 };
 

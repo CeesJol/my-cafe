@@ -14,7 +14,6 @@ const languageStrings = {
 const AWS = require("aws-sdk");
 const {
   randomId,
-  PRICE_INFLUENCE,
   getEvent,
   getResults,
   getActionExplanation,
@@ -43,8 +42,6 @@ const LaunchRequest = {
         debug: true,
       };
     }
-
-    let letMeStartOver = false;
 
     attributes = {
       // Initialize attributes for first open
@@ -161,7 +158,7 @@ const YesIntent = {
     }
 
     return (
-      !continueOrNew &&
+      continueOrNew &&
       Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
       Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.YesIntent"
     );
@@ -172,7 +169,6 @@ const YesIntent = {
     const sessionAttributes = attributesManager.getSessionAttributes();
 
     sessionAttributes.gameState = "PLAYING";
-    sessionAttributes.guessNumber = Math.floor(Math.random() * 101);
 
     return handlerInput.responseBuilder
       .speak(requestAttributes.t("YES_MESSAGE"))
@@ -207,16 +203,15 @@ const NoIntent = {
     const requestAttributes = attributesManager.getRequestAttributes();
     const sessionAttributes = attributesManager.getSessionAttributes();
 
-    sessionAttributes.endedSessionCount += 1;
-    sessionAttributes.gameState = "ENDED";
-
-    try {
-      attributesManager.setPersistentAttributes(sessionAttributes);
-      await attributesManager.savePersistentAttributes();
-    } catch (e) {}
+    attributes = {
+      ...sessionAttributes,
+      ...createAttributes(),
+    };
+    attributesManager.setSessionAttributes(attributes);
 
     return handlerInput.responseBuilder
       .speak(requestAttributes.t("EXIT_MESSAGE"))
+      .reprompt(requestAttributes.t("EXIT_MESSAGE"))
       .getResponse();
   },
 };
@@ -224,9 +219,8 @@ const NoIntent = {
 const PromoteHelpIntent = {
   canHandle(handlerInput) {
     return (
-      Alexa.getRequestType(handlerInput.requestEnvelope) ===
-        "PromoteHelpRequest" &&
-      Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.NoIntent"
+      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === "PromoteHelpIntent"
     );
   },
   async handle(handlerInput) {
@@ -292,7 +286,7 @@ const handleAction = async (handlerInput, action) => {
   }
 
   let event = getEvent(sessionAttributes.week);
-  let hint = sessionAttributes.week <= NUMBER_OF_EVENTS ? event.hint || "" : ""; // Only give event in first few weeks
+  let hint = sessionAttributes.week <= NUMBER_OF_EVENTS ? event.hint || "" : ""; // Only give hint in first few weeks
   let warning = "";
   let isRepeat = false;
   if (sessionAttributes.action === action) {
