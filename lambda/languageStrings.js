@@ -13,67 +13,48 @@ module.exports = {
     LAUNCH_MESSAGE_NEW_GAME: `Welcome back to My Cafe. 
 		Your highscore is %s. 
 		You start with 50 wealth and 50 popularity. 
-		Remember, each week, you can take one action: increase prices, decrease prices, advertize, or promote an item. You can promote either hot or cold drinks.
-		Which action would you like to take?`,
+		Remember: don't let your wealth or popularity drop below 0, or above 100!
+		%s`,
     LAUNCH_MESSAGE_DEV: `Welcome back to My Cafe, dev.`,
     LAUNCH_MESSAGE_FIRST_OPEN: `Welcome to My Cafe. 
 		In My Cafe, you build your cafe to a respected and warm place for your customers to get drinks and foods.
 		You start with 50 wealth and 50 popularity. 
-		Keep your wealth and popularity above 0 to survive!
-		If you fall below 0 health, you go bankrupt.
-		If you fall below 0 popularity, your landlord will throw you out.
-		Each week, you can take one action: increase prices, decrease prices, advertize, or promote an item. You can promote either hot or cold drinks.
-		Since this is your first week, it is recommended to decrease your prices this week to get more customers.
-		Say 'decrease prices' to get started.`,
+		Don't let your wealth or popularity drop below 0, or above 100!
+		%s`,
     START_EMPLOYEE_DEV: `Welcome to My Cafe, dev.`,
-    START_MACHINE_CONFIRM: `Great! You bought your first machine. You have %s dollars left. Your cafe has officially opened! ${NEXT_WEEK}`,
     // Game over
-    GAME_OVER_POPULARITY:
-      "Your popularity went below zero. Your landlord is not happy with you anymore and has decided to kick you out. Your final score is: %s. Would you like to play again?",
-    GAME_OVER_WEALTH:
-      "Your wealth went below zero, which means you went bankrupt. Your final score is: %s. Would you like to play again?",
+    // - result of action
+    // - wealth statement
+    // - popularity statement
+    // - your score
+    // - statement regarding your score and highscore
+    GAME_OVER_POPULARITY_LOW:
+      "%s %s %s Your popularity went below zero. Your landlord is not happy with you anymore and has decided to kick you out. Your final score is: %s. %s Would you like to play again?",
+    GAME_OVER_WEALTH_LOW:
+      "%s %s %s Your wealth went below zero, which means you went bankrupt. Your final score is: %s. %s Would you like to play again?",
+    GAME_OVER_POPULARITY_HIGH:
+      "%s %s %s Your popularity went above 100. Your competition got anxious and set your place on fire. Your final score is: %s. %s Would you like to play again?",
+    GAME_OVER_WEALTH_HIGH:
+      "%s %s %s Your wealth went above 100. Your place got robbed and you lost everything. Your final score is: %s. %s Would you like to play again?",
     // Week turn
-    // - action and result
-    // - increase/decrease
-    // - amount change
-    // - new value
-    // - increase/decrease
-    // - amount change
-    // - new value
+    // - result of action
+    // - wealth statement
+    // - popularity statement
     // - warning
     // - event
-    // - hint
-    // - Call to action
     WEEK_TURN: `%s 
-		Your wealth %s by %s, to %s.
-		Your popularity %s by %s, to %s.
 		%s
 		%s
 		%s
 		%s`,
-    PROMOTE_ITEM_EXPLANATION:
-      "You can promote cold drinks or hot drinks. Which one would you like to promote?",
-    PROMOTE_ITEM_NOT_RECOGNIZED:
-      "I did not recognize that item. You can promote cold or hot drinks. Which one would you like to promote?",
-    BIG_OOF: "Big oof!",
-    // Buying a machine
-    BUY_MACHINE_CONFIRM: `Great! You bought %s. You have %s dollars left. ${NEXT_WEEK}`,
-    BUY_MACHINE_UNKNOWN: `I did not recognize that machine. The next available in the store is the %s for %s dollars. ${NEXT_WEEK}`,
-    BUY_MACHINE_CANT_AFFORD: `You cannot afford the %s. It costs %s dollars, but you have only %s dollars. ${NEXT_WEEK}`,
-    BUY_MACHINE_ALREADY_PURCHASED: `You already own the %s. The next available in the store is the %s for %s dollars. ${NEXT_WEEK}`,
+    SUB_EVENT: `%s`,
     // Basic stuff
-    FALLBACK_MESSAGE_DURING_GAME: `I didn't understand that. You can increase prices, decrease prices, advertize, or promote an item. Which action would you like to take?`,
+    FALLBACK_MESSAGE_DURING_GAME: `I didn't understand that. %s`,
     FALLBACK_MESSAGE_OUTSIDE_GAME: `I can't help you with that. I will come up with a number between 0 and 100 and you try to guess it by saying a number in that range. Would you like to play?`,
-
-    GUESS_CORRECT_MESSAGE: "%s is correct! Would you like to play again?",
-    TOO_HIGH_MESSAGE: "%s is too high.",
-    TOO_LOW_MESSAGE: "%s is too low.",
     CONTINUE_MESSAGE: "Say yes to play or no to quit.",
     HELP_MESSAGE:
       "I am thinking of a number between zero and one hundred, try to guess it and I will tell you if it is higher or lower.",
     ERROR_MESSAGE: "Sorry, an error occurred.",
-    YES_MESSAGE:
-      "Great! You can increase prices, decrease prices, advertize, or promote an item. Which action would you like to take?",
   },
 };
 
