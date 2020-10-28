@@ -52,7 +52,9 @@ const LaunchRequest = {
       attributes.gameState = "CONTINUE_OR_NEW";
       speechOutput = requestAttributes.t(
         "LAUNCH_MESSAGE_CONTINUE_OR_NEW",
-        attributes.highScore
+        attributes.highScore > 0
+          ? `Your highscore is ${attributes.highScore}.`
+          : ""
       );
     } else if (attributes.gamesPlayed === 0) {
       // Initialisation message if you haven't played yet
@@ -367,7 +369,7 @@ const handleAction = async (handlerInput, action) => {
 
       // Store persistent on game over
       try {
-        attributesManager.setPersistentAttributes(sessionAttributes);
+        attributesManager.setPersistentAttributes(attributes);
         await attributesManager.savePersistentAttributes();
       } catch (e) {}
 
