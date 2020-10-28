@@ -40,6 +40,7 @@ const LaunchRequest = {
       gamesPlayed: 0,
       debug: false,
       week: 1,
+      highScore: 0,
       id: randomId(),
       ...attributes,
     };
@@ -333,7 +334,8 @@ const handleAction = async (handlerInput, action) => {
 
     if (gameOver) {
       let highScoreString;
-      if (!sessionAttributes.highScore) highScoreString = "";
+      if (!sessionAttributes.highScore || sessionAttributes.highScore === 0)
+        highScoreString = "";
       else if (sessionAttributes.week > sessionAttributes.highScore)
         highScoreString = `Congratulations! You beat your previous high score of ${sessionAttributes.highScore}.`;
       else

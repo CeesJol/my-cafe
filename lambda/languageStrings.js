@@ -7,7 +7,7 @@ module.exports = {
     EXIT_MESSAGE: "Thanks for playing!",
     // Game start
     LAUNCH_MESSAGE_CONTINUE_OR_NEW: `Welcome back to My Cafe. 
-		Your highscore is %S.
+		Your highscore is %s.
 		You still have an open game. 
 		Do you want to continue this game?`,
     LAUNCH_MESSAGE_NEW_GAME: `Welcome back to My Cafe. 
