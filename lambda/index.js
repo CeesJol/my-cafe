@@ -12,13 +12,7 @@ const languageStrings = {
   en: require("./languageStrings"),
 };
 const AWS = require("aws-sdk");
-const {
-  randomId,
-  getEvent,
-  getResults,
-  NUMBER_OF_EVENTS,
-  createAttributes,
-} = require("./constants");
+const { randomId, getEvent, createAttributes } = require("./constants");
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -155,22 +149,37 @@ const YesIntent = {
     const requestAttributes = attributesManager.getRequestAttributes();
     const sessionAttributes = attributesManager.getSessionAttributes();
 
-    if ((sessionAttributes.gameState = "PLAYING")) {
+    if (sessionAttributes.gameState === "PLAYING") {
       return handleAction(handlerInput, "yes");
+    } else if (sessionAttributes.gameState === "CONTINUE_OR_NEW") {
+      // User wants to continue where they left off
+      sessionAttributes.gameState = "PLAYING";
+
+      // Exploit SUB_EVENT to repeat the last event
+      const speechOutput = requestAttributes.t(
+        "SUB_EVENT",
+        sessionAttributes.event.description
+      );
+
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .reprompt(speechOutput)
+        .getResponse();
+    } else {
+      // NEW_GAME_OR_QUIT
+      // User wants to start a new game
+      sessionAttributes.gameState = "PLAYING";
+
+      let event = getEvent(sessionAttributes.week);
+      sessionAttributes.event = event;
+
+      let speechOutput = requestAttributes.t("SUB_EVENT", event.description);
+
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .reprompt(speechOutput)
+        .getResponse();
     }
-    // User wants to continue where they left off
-    sessionAttributes.gameState = "PLAYING";
-
-    // Exploit SUB_EVENT to repeat the last event
-    const speechOutput = requestAttributes.t(
-      "SUB_EVENT",
-      sessionAttributes.event[action].description
-    );
-
-    return handlerInput.responseBuilder
-      .speak(speechOutput)
-      .reprompt(speechOutput)
-      .getResponse();
   },
 };
 
@@ -181,34 +190,35 @@ const NoIntent = {
   async handle(handlerInput) {
     const { attributesManager } = handlerInput;
     const requestAttributes = attributesManager.getRequestAttributes();
-    const sessionAttributes = attributesManager.getSessionAttributes();
+    let sessionAttributes = attributesManager.getSessionAttributes();
+    let speechOutput;
 
-    if ((sessionAttributes.gameState = "PLAYING")) {
+    if (sessionAttributes.gameState === "PLAYING") {
       return handleAction(handlerInput, "no");
-    } else {
-      let speechOutput;
+    } else if (sessionAttributes.gameState === "CONTINUE_OR_NEW") {
+      // CONTINUE_OR_NEW: Create new game
       sessionAttributes.gameState = "PLAYING";
       sessionAttributes = {
         ...sessionAttributes,
         ...createAttributes(),
       };
 
-      if (sessionAttributes.gamesPlayed === 0) {
-        // Initialisation message if you haven't played yet
-        speechOutput = requestAttributes.t("LAUNCH_MESSAGE_FIRST_OPEN");
-      } else {
-        // Create a new game for an existing user
-        speechOutput = requestAttributes.t(
-          "LAUNCH_MESSAGE_NEW_GAME",
-          sessionAttributes.highScore
-        );
-      }
-    }
+      // Create event
+      let event = getEvent(sessionAttributes.week);
+      sessionAttributes.event = event;
 
-    return handlerInput.responseBuilder
-      .speak(speechOutput)
-      .reprompt(speechOutput)
-      .getResponse();
+      speechOutput = requestAttributes.t("SUB_EVENT", event.description);
+
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .reprompt(speechOutput)
+        .getResponse();
+    } else {
+      // NEW_GAME_OR_QUIT: Stop the game
+      return handlerInput.responseBuilder
+        .speak(requestAttributes.t("EXIT_MESSAGE"))
+        .getResponse();
+    }
   },
 };
 
@@ -235,7 +245,8 @@ const canHandleInGame = (handlerInput, intentName) => {
   if (
     sessionAttributes.gameState &&
     (sessionAttributes.gameState === "PLAYING" ||
-      sessionAttributes.gameState === "CONTINUE_OR_NEW")
+      sessionAttributes.gameState === "CONTINUE_OR_NEW" ||
+      sessionAttributes.gameState === "NEW_GAME_OR_QUIT")
   ) {
     canHandle = true;
   }
@@ -259,12 +270,12 @@ const handleAction = async (handlerInput, action) => {
   let speechOutput;
   let warning = "";
   let gameOver = false;
-  if (event.wealth || event.popularity) {
+  if (!event.yes) {
     // This is a final event
     if (event.wealth) {
       sessionAttributes.wealth += event.wealth;
       wealthStatement = `Your wealth ${
-        sessionAttributes.wealth > 0 ? "increased" : "decreased"
+        event.wealth > 0 ? "increased" : "decreased"
       } to ${sessionAttributes.wealth}.`;
 
       if (sessionAttributes.wealth <= 0) {
@@ -276,7 +287,7 @@ const handleAction = async (handlerInput, action) => {
     if (event.popularity) {
       sessionAttributes.popularity += event.popularity;
       popularityStatement = `Your popularity ${
-        sessionAttributes.popularity > 0 ? "increased" : "decreased"
+        event.popularity > 0 ? "increased" : "decreased"
       } to ${sessionAttributes.popularity}.`;
 
       if (sessionAttributes.popularity <= 0) {
@@ -303,10 +314,20 @@ const handleAction = async (handlerInput, action) => {
         highScoreString
       );
 
+      // Update high score
       sessionAttributes.highScore = Math.max(
-        sessionAttrributes.week,
+        sessionAttributes.week,
         sessionAttributes.highScore
       );
+
+      // Reset game
+      let attributes = {
+        ...sessionAttributes,
+        ...createAttributes("NEW_GAME_OR_QUIT"),
+        gamesPlayed: sessionAttributes.gamesPlayed + 1,
+      };
+
+      attributesManager.setSessionAttributes(attributes);
 
       // Store persistent on game over
       try {

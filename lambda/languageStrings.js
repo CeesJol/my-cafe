@@ -49,7 +49,7 @@ module.exports = {
 		%s`,
     SUB_EVENT: `%s`,
     // Basic stuff
-    FALLBACK_MESSAGE_DURING_GAME: `I didn't understand that. %s`,
+    FALLBACK_MESSAGE_DURING_GAME: `I didn't understand that. Please answer with yes or no. %s`,
     FALLBACK_MESSAGE_OUTSIDE_GAME: `I can't help you with that. I will come up with a number between 0 and 100 and you try to guess it by saying a number in that range. Would you like to play?`,
     CONTINUE_MESSAGE: "Say yes to play or no to quit.",
     HELP_MESSAGE:

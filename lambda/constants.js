@@ -64,7 +64,7 @@ const EVENTS = [
       },
     },
     no: {
-      description: "The competetition has driven your sales down dramatically.",
+      description: "The competition has driven your sales down dramatically.",
       wealth: -30,
     },
   },
@@ -99,22 +99,12 @@ const getEvent = (week) => {
   return EVENTS[(week - 1) % EVENTS.length];
 };
 
-const getResults = (action, week) => {
-  console.log("week:", week);
-  console.log("getEvent(week):", getEvent(week));
-  let reward;
-
-  reward = EVENTS[week][action];
-
-  return reward;
-};
-
 /**
  * SESSION ATTRIBUTES
  */
-const createAttributes = () => {
+const createAttributes = (gameState) => {
   return {
-    gameState: "PLAYING",
+    gameState: gameState || "PLAYING",
     wealth: 50,
     popularity: 50,
     week: 1,
@@ -124,7 +114,6 @@ const createAttributes = () => {
 module.exports = {
   randomId,
   getEvent,
-  getResults,
   NUMBER_OF_EVENTS,
   createAttributes,
 };
