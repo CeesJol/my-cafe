@@ -55,6 +55,8 @@ module.exports = {
     HELP_MESSAGE:
       "I am thinking of a number between zero and one hundred, try to guess it and I will tell you if it is higher or lower.",
     ERROR_MESSAGE: "Sorry, an error occurred.",
+    RESET_SUCCESS:
+      "I resetted you successfully. Would you like to play a new game?",
   },
 };
 

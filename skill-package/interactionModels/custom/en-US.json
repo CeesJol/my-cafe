@@ -112,6 +112,15 @@
 											"which item to promote",
 											"which items can I promote"
 									]
+							},
+							{
+									"name": "ResetIntent",
+									"slots": [],
+									"samples": [
+											"delete my stats",
+											"reset me",
+											"reset"
+									]
 							}
 					],
 					"types": [

@@ -222,6 +222,40 @@ const NoIntent = {
   },
 };
 
+const ResetIntent = {
+  canHandle(handlerInput) {
+    return (
+      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === "ResetIntent"
+    );
+  },
+  async handle(handlerInput) {
+    const { attributesManager } = handlerInput;
+    const requestAttributes = attributesManager.getRequestAttributes();
+    const sessionAttributes = attributesManager.getSessionAttributes();
+    let speechOutput;
+
+    // Reset player
+    let attributes = {
+      ...sessionAttributes,
+      ...createAttributes("NEW_GAME_OR_QUIT"),
+    };
+
+    // Create event
+    let event = getEvent(sessionAttributes.week);
+    sessionAttributes.event = event;
+
+    attributesManager.setSessionAttributes(attributes);
+
+    speechOutput = requestAttributes.t("RESET_SUCCESS");
+
+    return handlerInput.responseBuilder
+      .speak(speechOutput)
+      .reprompt(speechOutput)
+      .getResponse();
+  },
+};
+
 const UnhandledIntent = {
   canHandle() {
     return true;
@@ -492,6 +526,7 @@ exports.handler = skillBuilder
     HelpIntent,
     YesIntent,
     NoIntent,
+    ResetIntent,
     FallbackHandler,
     UnhandledIntent
   )
