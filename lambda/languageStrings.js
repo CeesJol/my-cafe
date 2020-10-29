@@ -1,49 +1,50 @@
-const ANTONIO = "Giorgio";
-const NEXT_WEEK = "Say 'next week' to jump to the next week.";
+const BEAT_HIGHSCORE_CTA = "Would you like to attempt to beat that score?";
 
 module.exports = {
   translation: {
     SKILL_NAME: "My Cafe",
     EXIT_MESSAGE: "Thanks for playing!",
-    // Game start
+    // Game start: existing game avaiable
     // - High score (optional)
     LAUNCH_MESSAGE_CONTINUE_OR_NEW: `Welcome back to My Cafe. 
 		%s
 		You still have an open game. 
 		Do you want to continue this game?`,
+    // Game start: existing user starts new game
+    // - High score (optional)
+    // - Event
     LAUNCH_MESSAGE_NEW_GAME: `Welcome back to My Cafe. 
-		Your highscore is %s. 
-		You start with 50 wealth and 50 popularity. 
-		Remember: don't let your wealth or popularity drop below 0, or above 100!
+		%s
+		You start with 50 wealth and 50 popularity.
+		Remember: stay between 0 and 100 to keep your cafe alive!
 		%s`,
-    LAUNCH_MESSAGE_DEV: `Welcome back to My Cafe, dev.`,
+    // Game start: user's first game
+    // - Event
     LAUNCH_MESSAGE_FIRST_OPEN: `Welcome to My Cafe. 
-		In My Cafe, you build your cafe to a respected and warm place for your customers to get drinks and foods.
+		You recently opened your cafe and your customers seem to be loving your blends.
+		For each day in your cafe, I will ask you a difficult question and you need to answer yes or no to each question.
 		You start with 50 wealth and 50 popularity. 
-		Don't let your wealth or popularity drop below 0, or above 100!
+		Stay between 0 and 100 to keep your cafe alive!
 		%s`,
-    START_EMPLOYEE_DEV: `Welcome to My Cafe, dev.`,
     // Game over
     // - result of action
     // - wealth statement
     // - popularity statement
     // - your score
     // - statement regarding your score and highscore
-    GAME_OVER_POPULARITY_LOW:
-      "%s %s %s Your popularity went below zero. Your landlord is not happy with you anymore and has decided to kick you out. Your final score is: %s. %s Would you like to play again?",
-    GAME_OVER_WEALTH_LOW:
-      "%s %s %s Your wealth went below zero, which means you went bankrupt. Your final score is: %s. %s Would you like to play again?",
-    GAME_OVER_POPULARITY_HIGH:
-      "%s %s %s Your popularity went above 100. Your competition got anxious and set your place on fire. Your final score is: %s. %s Would you like to play again?",
-    GAME_OVER_WEALTH_HIGH:
-      "%s %s %s Your wealth went above 100. Your place got robbed and you lost everything. Your final score is: %s. %s Would you like to play again?",
+    GAME_OVER_POPULARITY_LOW: `%s %s %s Your popularity went below zero. Your landlord is not happy with you anymore and has decided to kick you out. Your popularity must stay above 0. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
+    GAME_OVER_WEALTH_LOW: `%s %s %s Your wealth went below zero, which means you went bankrupt. Your wealth must stay above 0. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
+    GAME_OVER_POPULARITY_HIGH: `%s %s %s Your popularity went above 100. Your competition got anxious and set your place on fire. Your popularity must stay below 100. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
+    GAME_OVER_WEALTH_HIGH: `%s %s %s Your wealth went above 100. Your place got robbed and you lost everything. Your wealth must stay below 100. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
     // Week turn
     // - result of action
     // - wealth statement
+    // - wealth warning (optional)
     // - popularity statement
-    // - warning
+    // - popularity warning (optional)
     // - event
     WEEK_TURN: `%s 
+		%s
 		%s
 		%s
 		%s

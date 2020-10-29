@@ -39,13 +39,12 @@ const LaunchRequest = {
       // Initialize attributes for first open
       gamesPlayed: 0,
       debug: false,
-      week: 1,
+      week: 0,
       highScore: 0,
       id: randomId(),
       ...attributes,
     };
 
-    // Shorten the output if debugging
     let speechOutput;
     if (attributes.week > 1) {
       // Ask user to continue if they still have an open game
@@ -58,7 +57,11 @@ const LaunchRequest = {
       );
     } else if (attributes.gamesPlayed === 0) {
       // Initialisation message if you haven't played yet
-      let event = getEvent(attributes.week);
+      attributes = {
+        ...attributes,
+        ...createAttributes(),
+      };
+      let event = getEvent(attributes.week, attributes.eventsOrder);
       console.log("event:", event);
       attributes.event = event;
       speechOutput = requestAttributes.t(
@@ -66,15 +69,14 @@ const LaunchRequest = {
         event.description
       );
       attributes.gameState = "PLAYING";
-      attributes = {
-        ...attributes,
-        ...createAttributes(),
-      };
     } else {
       // Create a new game for an existing user
       speechOutput = requestAttributes.t(
         "LAUNCH_MESSAGE_NEW_GAME",
-        attributes.highScore
+        attributes.highScore > 0
+          ? `Your highscore is ${attributes.highScore}.`
+          : "",
+        attributes.event.description
       );
       attributes.gameState = "PLAYING";
       attributes = {
@@ -171,10 +173,17 @@ const YesIntent = {
     } else {
       // NEW_GAME_OR_QUIT
       // User wants to start a new game
-      sessionAttributes.gameState = "PLAYING";
+      let attributes = sessionAttributes;
+      attributes.gameState = "PLAYING";
+      attributes = {
+        ...sessionAttributes,
+        ...createAttributes(),
+      };
 
-      let event = getEvent(sessionAttributes.week);
-      sessionAttributes.event = event;
+      let event = getEvent(attributes.week, attributes.eventsOrder);
+      attributes.event = event;
+
+      attributesManager.setSessionAttributes(attributes);
 
       let speechOutput = requestAttributes.t("SUB_EVENT", event.description);
 
@@ -193,22 +202,25 @@ const NoIntent = {
   async handle(handlerInput) {
     const { attributesManager } = handlerInput;
     const requestAttributes = attributesManager.getRequestAttributes();
-    let sessionAttributes = attributesManager.getSessionAttributes();
+    const sessionAttributes = attributesManager.getSessionAttributes();
     let speechOutput;
 
     if (sessionAttributes.gameState === "PLAYING") {
       return handleAction(handlerInput, "no");
     } else if (sessionAttributes.gameState === "CONTINUE_OR_NEW") {
       // CONTINUE_OR_NEW: Create new game
-      sessionAttributes.gameState = "PLAYING";
-      sessionAttributes = {
+      let attributes = sessionAttributes;
+      attributes.gameState = "PLAYING";
+      attributes = {
         ...sessionAttributes,
         ...createAttributes(),
       };
 
       // Create event
-      let event = getEvent(sessionAttributes.week);
-      sessionAttributes.event = event;
+      let event = getEvent(attributes.week, attributes.eventsOrder);
+      attributes.event = event;
+
+      attributesManager.setSessionAttributes(attributes);
 
       speechOutput = requestAttributes.t("SUB_EVENT", event.description);
 
@@ -245,7 +257,7 @@ const ResetIntent = {
     };
 
     // Create event
-    let event = getEvent(sessionAttributes.week);
+    let event = getEvent(sessionAttributes.week, sessionAttributes.eventsOrder);
     sessionAttributes.event = event;
 
     attributesManager.setSessionAttributes(attributes);
@@ -305,7 +317,8 @@ const handleAction = async (handlerInput, action) => {
   let event = sessionAttributes.event[action];
   let oldEventDescription = event.description;
   let speechOutput;
-  let warning = "";
+  let wealthWarning = "";
+  let popularityWarning = "";
   let gameOver = false;
   if (!event.yes) {
     // This is a final event
@@ -320,6 +333,14 @@ const handleAction = async (handlerInput, action) => {
       } else if (sessionAttributes.wealth >= 100) {
         gameOver = "WEALTH_HIGH";
       }
+
+      if (
+        sessionAttributes.wealth <= 20 &&
+        sessionAttributes.wealth - event.wealth > 20
+      ) {
+        wealthWarning =
+          "Be careful: if your wealth drops below 0, you will go bankrupt.";
+      }
     }
     if (event.popularity) {
       sessionAttributes.popularity += event.popularity;
@@ -332,16 +353,33 @@ const handleAction = async (handlerInput, action) => {
       } else if (sessionAttributes.popularity >= 100) {
         gameOver = "POPULARITY_HIGH";
       }
+
+      if (
+        sessionAttributes.popularity <= 20 &&
+        sessionAttributes.popularity - event.popularity > 20
+      ) {
+        popularityWarning =
+          "Be careful: if your popularity drops below 0, you landlord will throw you out.";
+      }
     }
 
     if (gameOver) {
+      const previousHighScore = sessionAttributes.highScore;
+
+      // Update high score
+
       let highScoreString;
-      if (!sessionAttributes.highScore || sessionAttributes.highScore === 0)
-        highScoreString = "";
-      else if (sessionAttributes.week > sessionAttributes.highScore)
-        highScoreString = `Congratulations! You beat your previous high score of ${sessionAttributes.highScore}.`;
-      else
-        highScoreString = `Your high score is ${sessionAttributes.highScore}.`;
+      if (
+        sessionAttributes.highScore &&
+        sessionAttributes.week > sessionAttributes.highScore
+      ) {
+        // Highscore improved
+        sessionAttributes.highScore = sessionAttributes.week;
+        highScoreString = `Congratulations! You beat your previous high score of ${previousHighScore}.`;
+      } else {
+        // First score, or highscore not improved
+        highScoreString = `Your high score is ${previousHighScore}.`;
+      }
 
       let speechOutput = requestAttributes.t(
         `GAME_OVER_${gameOver}`,
@@ -350,12 +388,6 @@ const handleAction = async (handlerInput, action) => {
         popularityStatement,
         sessionAttributes.week,
         highScoreString
-      );
-
-      // Update high score
-      sessionAttributes.highScore = Math.max(
-        sessionAttributes.week,
-        sessionAttributes.highScore
       );
 
       // Reset game
@@ -380,15 +412,17 @@ const handleAction = async (handlerInput, action) => {
     }
 
     // Update event and week
-    event = getEvent(++sessionAttributes.week);
+    event = getEvent(++sessionAttributes.week, sessionAttributes.eventsOrder);
+    console.log("event2:", event);
 
     // Give results, go to next week.
     speechOutput = requestAttributes.t(
       "WEEK_TURN",
       oldEventDescription,
       wealthStatement,
+      wealthWarning,
       popularityStatement,
-      warning,
+      popularityWarning,
       event.description
     );
 
