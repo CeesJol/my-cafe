@@ -33,85 +33,8 @@
 									"samples": []
 							},
 							{
-									"name": "BuyMachineIntent",
-									"slots": [
-											{
-													"name": "machine",
-													"type": "machine"
-											}
-									],
-									"samples": [
-											"buy the {machine} ",
-											"get {machine}",
-											"buy {machine} "
-									]
-							},
-							{
 									"name": "AMAZON.NavigateHomeIntent",
 									"samples": []
-							},
-							{
-									"name": "NextWeekIntent",
-									"slots": [],
-									"samples": [
-											"continue game",
-											"turn to next week",
-											"take turn",
-											"next week"
-									]
-							},
-							{
-									"name": "IncreasePricesIntent",
-									"slots": [],
-									"samples": [
-											"increase price",
-											"increase prices"
-									]
-							},
-							{
-									"name": "DecreasePricesIntent",
-									"slots": [],
-									"samples": [
-											"lower the prices",
-											"add sales",
-											"decrease price",
-											"decrease prices"
-									]
-							},
-							{
-									"name": "AdvertizeIntent",
-									"slots": [],
-									"samples": [
-											"make commercials",
-											"ads",
-											"create ads",
-											"advertize"
-									]
-							},
-							{
-									"name": "PromoteIntent",
-									"slots": [
-											{
-													"name": "item",
-													"type": "item"
-											}
-									],
-									"samples": [
-											"promote {item}"
-									]
-							},
-							{
-									"name": "PromoteHelpIntent",
-									"slots": [],
-									"samples": [
-											"can I promote",
-											"how do I promote",
-											"what is promoting",
-											"what to promote",
-											"what can I promote",
-											"which item to promote",
-											"which items can I promote"
-									]
 							},
 							{
 									"name": "ResetIntent",
@@ -123,61 +46,7 @@
 									]
 							}
 					],
-					"types": [
-							{
-									"name": "machine",
-									"values": [
-											{
-													"name": {
-															"value": "latte machine"
-													}
-											},
-											{
-													"name": {
-															"value": "americano machine"
-													}
-											},
-											{
-													"name": {
-															"value": "espresso machine"
-													}
-											},
-											{
-													"name": {
-															"value": "cappuccino machine"
-													}
-											},
-											{
-													"name": {
-															"value": "tea machine"
-													}
-											},
-											{
-													"name": {
-															"value": "coffee machine"
-													}
-											}
-									]
-							},
-							{
-									"name": "item",
-									"values": [
-											{
-													"name": {
-															"value": "cold drinks"
-													}
-											},
-											{
-													"name": {
-															"value": "hot drinks",
-															"synonyms": [
-																	"warm drinks"
-															]
-													}
-											}
-									]
-							}
-					]
+					"types": []
 			}
 	}
 }

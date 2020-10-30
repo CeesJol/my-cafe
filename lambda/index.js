@@ -12,7 +12,7 @@ const languageStrings = {
   en: require("./languageStrings"),
 };
 const AWS = require("aws-sdk");
-const { randomId, getEvent, createAttributes } = require("./constants");
+const { randomId, getEvent, createAttributes } = require("./lib");
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -39,14 +39,14 @@ const LaunchRequest = {
       // Initialize attributes for first open
       gamesPlayed: 0,
       debug: false,
-      week: 0,
+      day: 0,
       highScore: 0,
       id: randomId(),
       ...attributes,
     };
 
     let speechOutput;
-    if (attributes.week > 1) {
+    if (attributes.day > 1) {
       // Ask user to continue if they still have an open game
       attributes.gameState = "CONTINUE_OR_NEW";
       speechOutput = requestAttributes.t(
@@ -61,7 +61,7 @@ const LaunchRequest = {
         ...attributes,
         ...createAttributes(),
       };
-      let event = getEvent(attributes.week, attributes.eventsOrder);
+      let event = getEvent(attributes.day, attributes.eventsOrder);
       console.log("event:", event);
       attributes.event = event;
       speechOutput = requestAttributes.t(
@@ -180,7 +180,7 @@ const YesIntent = {
         ...createAttributes(),
       };
 
-      let event = getEvent(attributes.week, attributes.eventsOrder);
+      let event = getEvent(attributes.day, attributes.eventsOrder);
       attributes.event = event;
 
       attributesManager.setSessionAttributes(attributes);
@@ -217,7 +217,7 @@ const NoIntent = {
       };
 
       // Create event
-      let event = getEvent(attributes.week, attributes.eventsOrder);
+      let event = getEvent(attributes.day, attributes.eventsOrder);
       attributes.event = event;
 
       attributesManager.setSessionAttributes(attributes);
@@ -257,7 +257,7 @@ const ResetIntent = {
     };
 
     // Create event
-    let event = getEvent(sessionAttributes.week, sessionAttributes.eventsOrder);
+    let event = getEvent(sessionAttributes.day, sessionAttributes.eventsOrder);
     sessionAttributes.event = event;
 
     attributesManager.setSessionAttributes(attributes);
@@ -371,10 +371,10 @@ const handleAction = async (handlerInput, action) => {
       let highScoreString;
       if (
         sessionAttributes.highScore &&
-        sessionAttributes.week > sessionAttributes.highScore
+        sessionAttributes.day > sessionAttributes.highScore
       ) {
         // Highscore improved
-        sessionAttributes.highScore = sessionAttributes.week;
+        sessionAttributes.highScore = sessionAttributes.day;
         highScoreString = `Congratulations! You beat your previous high score of ${previousHighScore}.`;
       } else {
         // First score, or highscore not improved
@@ -386,7 +386,7 @@ const handleAction = async (handlerInput, action) => {
         oldEventDescription,
         wealthStatement,
         popularityStatement,
-        sessionAttributes.week,
+        sessionAttributes.day,
         highScoreString
       );
 
@@ -411,13 +411,13 @@ const handleAction = async (handlerInput, action) => {
         .getResponse();
     }
 
-    // Update event and week
-    event = getEvent(++sessionAttributes.week, sessionAttributes.eventsOrder);
+    // Update event and day
+    event = getEvent(++sessionAttributes.day, sessionAttributes.eventsOrder);
     console.log("event2:", event);
 
-    // Give results, go to next week.
+    // Give results, go to next day.
     speechOutput = requestAttributes.t(
-      "WEEK_TURN",
+      "DAY_TURN",
       oldEventDescription,
       wealthStatement,
       wealthWarning,

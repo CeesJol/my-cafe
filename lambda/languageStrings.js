@@ -36,14 +36,14 @@ module.exports = {
     GAME_OVER_WEALTH_LOW: `%s %s %s Your wealth went below zero, which means you went bankrupt. Your wealth must stay above 0. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
     GAME_OVER_POPULARITY_HIGH: `%s %s %s Your popularity went above 100. Your competition got anxious and set your place on fire. Your popularity must stay below 100. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
     GAME_OVER_WEALTH_HIGH: `%s %s %s Your wealth went above 100. Your place got robbed and you lost everything. Your wealth must stay below 100. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
-    // Week turn
+    // Day turn
     // - result of action
     // - wealth statement
     // - wealth warning (optional)
     // - popularity statement
     // - popularity warning (optional)
     // - event
-    WEEK_TURN: `%s 
+    DAY_TURN: `%s 
 		%s
 		%s
 		%s
@@ -62,12 +62,12 @@ module.exports = {
   },
 };
 
-// Week turn
-// - week number
+// Day turn
+// - day number
 // - profit (dollars)
 // - upcoming event
 // - hint
-// WEEK_TURN: `A week has passed. It is now week %s. You made a profit of %s dollars, which brings you at a total of %s dollars.
+// DAY_TURN: `A day has passed. It is now day %s. You made a profit of %s dollars, which brings you at a total of %s dollars.
 // %s
 // %s
 // `,
@@ -75,5 +75,5 @@ module.exports = {
 // 		Antonio said he could meet up to set up the cafe.
 // 		<audio src="soundbank://soundlibrary/footsteps/wood/wood_09"/>
 // 		<voice name="${ANTONIO}">Hi there, I'm excited to get started.</voice>
-// Antonio will work in your restaurant for free for the first 4 weeks, after which you need to pay him 500 dollars per month.
+// Antonio will work in your restaurant for free for the first 4 days, after which you need to pay him 500 dollars per month.
 // 		Now, we need to buy a machine to produce drinks. Say 'Buy coffee machine' to buy your first machine!`,
