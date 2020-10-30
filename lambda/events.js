@@ -161,7 +161,7 @@ const EVENTS = [
     },
     no: {
       description:
-        "The band is furious and threatens you. Before they can damage your cafe the police arrive and threaten them. The band turns out to be thieves. The police is thankful for standing your ground.",
+        "The band is furious and threatens you. Before they can damage your cafe the police arrive and arrest them. The band turns out to be thieves. The police is thankful for standing your ground.",
       popularity: 20,
     },
   },

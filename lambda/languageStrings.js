@@ -32,10 +32,10 @@ module.exports = {
     // - popularity statement
     // - your score
     // - statement regarding your score and highscore
-    GAME_OVER_POPULARITY_LOW: `%s %s %s Your popularity went below zero. Your landlord is not happy with you anymore and has decided to kick you out. Your popularity must stay above 0. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
-    GAME_OVER_WEALTH_LOW: `%s %s %s Your wealth went below zero, which means you went bankrupt. Your wealth must stay above 0. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
-    GAME_OVER_POPULARITY_HIGH: `%s %s %s Your popularity went above 100. Your competition got anxious and set your place on fire. Your popularity must stay below 100. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
-    GAME_OVER_WEALTH_HIGH: `%s %s %s Your wealth went above 100. Your place got robbed and you lost everything. Your wealth must stay below 100. Your final score is: %s. %s ${BEAT_HIGHSCORE_CTA}`,
+    GAME_OVER_POPULARITY_LOW: `%s %s %s Your popularity went below zero. Your landlord is not happy with you anymore and has decided to kick you out. Your popularity must stay above 0. Your final score is: %s days. %s ${BEAT_HIGHSCORE_CTA}`,
+    GAME_OVER_WEALTH_LOW: `%s %s %s Your wealth went below zero, which means you went bankrupt. Your wealth must stay above 0. Your final score is: %s days. %s ${BEAT_HIGHSCORE_CTA}`,
+    GAME_OVER_POPULARITY_HIGH: `%s %s %s Your popularity went above 100. Your competition got anxious and set your place on fire. Your popularity must stay below 100. Your final score is: %s days. %s ${BEAT_HIGHSCORE_CTA}`,
+    GAME_OVER_WEALTH_HIGH: `%s %s %s Your wealth went above 100. Your place got robbed and you lost everything. Your wealth must stay below 100. Your final score is: %s days. %s ${BEAT_HIGHSCORE_CTA}`,
     // Day turn
     // - result of action
     // - wealth statement

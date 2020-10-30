@@ -46,7 +46,7 @@ const LaunchRequest = {
     };
 
     let speechOutput;
-    if (attributes.day > 1) {
+    if (attributes.day >= 1) {
       // Ask user to continue if they still have an open game
       attributes.gameState = "CONTINUE_OR_NEW";
       speechOutput = requestAttributes.t(
