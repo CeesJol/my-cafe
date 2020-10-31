@@ -12,7 +12,12 @@ const languageStrings = {
   en: require("./languageStrings"),
 };
 const AWS = require("aws-sdk");
-const { randomId, getEvent, createAttributes } = require("./lib");
+const {
+  randomId,
+  getEvent,
+  createAttributes,
+  initAttributes,
+} = require("./lib");
 
 const LaunchRequest = {
   canHandle(handlerInput) {
@@ -37,11 +42,7 @@ const LaunchRequest = {
 
     attributes = {
       // Initialize attributes for first open
-      gamesPlayed: 0,
-      debug: false,
-      day: 0,
-      highScore: 0,
-      id: randomId(),
+      ...initAttributes(),
       ...attributes,
     };
 
@@ -252,7 +253,7 @@ const ResetIntent = {
 
     // Reset player
     let attributes = {
-      ...sessionAttributes,
+      ...initAttributes(),
       ...createAttributes("NEW_GAME_OR_QUIT"),
     };
 

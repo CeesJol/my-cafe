@@ -200,7 +200,7 @@ const EVENTS = [
       description: `Oops: ${BARISTA1} spoiled a cup of ice cream over ${VITAL1}. ${VITAL1} seems very upset. Do you want to charge no price to make up for it?`,
       yes: {
         description: `${VITAL1} appreciates your kindness.`,
-        wealth: -10,
+        popularity: 20,
       },
       no: {
         description: `${VITAL1} is not happy with the situation and mocks your cafe.`,

@@ -54,9 +54,20 @@ const createAttributes = (gameState) => {
   };
 };
 
+const initAttributes = () => {
+  return {
+    gamesPlayed: 0,
+    debug: false,
+    day: 0,
+    highScore: 0,
+    id: randomId(),
+  };
+};
+
 module.exports = {
   randomId,
   getEvent,
   getRandomEvent,
   createAttributes,
+  initAttributes,
 };
