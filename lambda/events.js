@@ -1,5 +1,6 @@
 const BARISTA1 = "Your barista, Joe, ";
 const BARISTA2 = "Your barista, Mocha, ";
+const FRIEND1 = "Java";
 const VILLAIN1 = "Miss Blackburns";
 const VITAL1 = "The mayor";
 
@@ -209,6 +210,69 @@ const EVENTS = [
     no: {
       description: `${VITAL1} is disappointed he couldn't celebrate his birthday at your place.`,
       popularity: -20,
+    },
+  },
+  {
+    description:
+      "One of your baristas, Mike, seems unmotivated. Do you want to fire him?",
+    yes: {
+      description: "Mike is disappointed that you fired him.",
+      popularity: -20,
+    },
+    no: {
+      description: "Should Mike get a raise to motivate him?",
+      yes: {
+        description:
+          "Mike appreciates the raise and seems more motivated than ever!",
+        wealth: -10,
+        popularity: 10,
+      },
+      no: {
+        description:
+          "Mike doesn't seem to be happy. Hopefully comes back happier tomorrow",
+        popularity: -10,
+      },
+    },
+  },
+  {
+    description:
+      "A new, larger place is being sold in town. The house is bigger than your current cafe. It costs 30 wealth. Do you want to buy it?",
+    yes: {
+      description:
+        "The house turns out to have woodworms. The damage is overlookable, but some of the wood should get replaced. Do you want to recover the wood?",
+      yes: {
+        description:
+          "Replacing the wood was costly, but your customers will appreciate it.",
+        wealth: -50,
+      },
+      no: {
+        description:
+          "Your customers are disappointed that you serve them in a worm-eaten cafe.",
+        popularity: -20,
+        wealth: -30,
+      },
+    },
+    no: {
+      description:
+        "That should be best. Your customers are attached to this place, after all.",
+    },
+  },
+  {
+    description: `Your friend, ${FRIEND1}, has come over to your cafe to play pong. Do you want to play?`,
+    yes: {
+      description: `Should we let ${FRIEND1} win?`,
+      yes: {
+        description: `${FRIEND1} feels unchallenged by your poor play.`,
+        popularity: -10,
+      },
+      no: {
+        description: `${FRIEND1} is impressed by your pong skills.`,
+        popularity: 10,
+      },
+    },
+    no: {
+      description: `${FRIEND1} is disappointed you don't want to play.`,
+      popularity: -10,
     },
   },
 ];
