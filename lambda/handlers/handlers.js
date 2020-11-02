@@ -33,6 +33,12 @@ const handleAction = async (handlerInput, action) => {
       ) {
         wealthWarning =
           "Be careful: if your wealth drops below 0, you will go bankrupt.";
+      } else if (
+        sessionAttributes.wealth >= 80 &&
+        sessionAttributes.wealth - event.wealth < 80
+      ) {
+        wealthWarning =
+          "Be careful: if your wealth increases above 100, you will get robbed and lose everything.";
       }
     }
     if (event.popularity) {
@@ -53,6 +59,12 @@ const handleAction = async (handlerInput, action) => {
       ) {
         popularityWarning =
           "Be careful: if your popularity drops below 0, you landlord will throw you out.";
+      } else if (
+        sessionAttributes.popularity >= 80 &&
+        sessionAttributes.popularity - event.popularity < 80
+      ) {
+        popularityWarning =
+          "Be careful: if your popularity increases above 100, your competition will start taking measures against you.";
       }
     }
 

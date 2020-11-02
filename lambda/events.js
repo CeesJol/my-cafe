@@ -1,7 +1,8 @@
-const BARISTA1 = "Your barista, Joe, ";
-const BARISTA2 = "Your barista, Mocha, ";
+const BARISTA1 = "Joe";
+const BARISTA2 = "Mocha";
 const FRIEND1 = "Java";
 const VILLAIN1 = "Miss Blackburns";
+const VILLAIN2 = "Mister Vazquez";
 const VITAL1 = "The mayor";
 
 const EVENTS = [
@@ -20,7 +21,7 @@ const EVENTS = [
   },
   {
     description:
-      "There are holidays today. Sales will always be worse during holidays. Would you like to add sales?",
+      "There are holidays today. Sales will always be worse during holidays. Would you like to give discounts to attract more customers?",
     yes: {
       description: "The sales drove new customers to your cafe.",
       popularity: 20,
@@ -36,23 +37,24 @@ const EVENTS = [
       "Cold and rainy weather is predicted for today. Would you like to promote your hot drinks for today?",
     yes: {
       description: "The promotion drove new customers to your cafe.",
-      wealth: 10,
+      wealth: 20,
     },
     no: {
       description: "Rain and thunder kept your customers away from your cafe.",
-      wealth: -10,
+      wealth: -20,
     },
   },
   {
     description:
-      "Sunny weather is predicted for today. Would you like to promote your ice cold drinks for today?",
+      "Sunny weather is predicted for today. Would you like to promote your hot drinks for today?",
     yes: {
-      description: "The promotion drove new customers to your cafe.",
-      wealth: 10,
+      description:
+        "The promotion had no effect. People seemed to desire ice cream more today.",
+      wealth: -20,
     },
     no: {
-      description: "Rain and thunder kept your customers away from your cafe.",
-      wealth: -10,
+      description: "The weather puts your regular customers in a great mood.",
+      popularity: 10,
     },
   },
   {
@@ -61,32 +63,32 @@ const EVENTS = [
     yes: {
       description:
         "Your customers appreciate your cafe and have started visiting more.",
-      wealth: 10,
+      wealth: 30,
     },
     no: {
       description: "Your customers are disappointed in the lack of change.",
-      popularity: -10,
+      popularity: -20,
     },
   },
   {
-    description: `${BARISTA2} offers to peek at competitors cafes to get information from them. Do you accept the offer?`,
+    description: `Your barista, ${BARISTA2}, offers to peek at competitors cafes to get information from them. Do you accept the offer?`,
     yes: {
       description:
         "The new information has allowed you to create a better menu.",
-      wealth: -10,
-      popularity: 20,
+      wealth: -20,
+      popularity: 40,
     },
     no: {
       description: "Makes sense, let's focus on our own business.",
     },
   },
   {
-    description: `${BARISTA1} has painted a great painting for your cafe. Do you want to purchase it and place it in your cafe?`,
+    description: `Your barista, ${BARISTA1}, has painted a great painting for your cafe. Do you want to purchase it and place it in your cafe?`,
     yes: {
       description:
         "The cafe looks even better with the painting and customers seem to like it.",
-      wealth: -10,
-      popularity: 20,
+      wealth: -20,
+      popularity: 30,
     },
     no: {
       description: `${BARISTA1} is disappointed but understands your decision.`,
@@ -103,15 +105,15 @@ const EVENTS = [
     },
   },
   {
-    description: `${BARISTA2} has found a new blend that creates a unique and amazing taste. Do you want to add it to your menu?`,
+    description: `Your barista, ${BARISTA2}, has found a new blend that creates a unique and amazing taste. Do you want to add it to your menu?`,
     yes: {
       description: "Your customers love the new blend!",
-      wealth: 10,
-      popularity: 10,
+      wealth: 20,
+      popularity: 20,
     },
     no: {
       description: `${BARISTA2} is disappointed about your decision.`,
-      popularity: -10,
+      popularity: -20,
     },
   },
   {
@@ -119,12 +121,12 @@ const EVENTS = [
       "One of your customers spills a drink on themselves. Do you give them a new one?",
     yes: {
       description: "The customer is grateful for the new drink.",
-      popularity: 10,
+      popularity: 20,
     },
     no: {
       description:
         "The customer is disappointed in your poor customer service.",
-      popularity: -10,
+      popularity: -20,
     },
   },
   {
@@ -133,7 +135,7 @@ const EVENTS = [
     yes: {
       description:
         "The family is offended and writes a negative review about your cafe.",
-      popularity: -20,
+      popularity: -30,
     },
     no: {
       description: "Your regular customers are annoyed but accept it.",
@@ -145,7 +147,7 @@ const EVENTS = [
     yes: {
       description: "Your customers love you for your kindness.",
       wealth: -10,
-      popularity: 10,
+      popularity: 30,
     },
     no: {
       description:
@@ -158,12 +160,39 @@ const EVENTS = [
     yes: {
       description:
         "The band turns out to be thieves and stole some of your money.",
-      wealth: -20,
+      wealth: -30,
     },
     no: {
       description:
         "The band is furious and threatens you. Before they can damage your cafe the police arrive and arrest them. The band turns out to be thieves. The police is thankful for standing your ground.",
       popularity: 20,
+    },
+  },
+  {
+    description:
+      "Your barista, Alice, has broken the tea machine by accident. Should we fire her?",
+    yes: {
+      description: "Alice is disappointed to be fired over a mistake.",
+      popularity: -20,
+    },
+    no: {
+      description:
+        "Luckily you are insured well, and the insurance pays for a new tea machine.",
+    },
+  },
+  {
+    description:
+      "There was a power outtage today, which means we made no income. Should we add sales to make up for it?",
+    yes: {
+      description:
+        "The sales recovered your sales and provided you with one of the most profitable days today!",
+      wealth: 20,
+    },
+    no: {
+      description:
+        "Your customers are disappointed with the experience of your cafe.",
+      wealth: -20,
+      popularity: -20,
     },
   },
   // Stories
@@ -174,18 +203,18 @@ const EVENTS = [
       yes: {
         description: `The police caught you destroying ${VILLAIN1}'s advertisements.`,
         wealth: -20,
-        popularity: -20,
+        popularity: -30,
       },
       no: {
         description: `The police is informed, but find no evidence that she removed your advertisements. The police leave, and you find yourself alone with ${VILLAIN1}'s advertisements. Would you like to destroy them and replace them with yours?`,
         yes: {
           description: `${VILLAIN1}'s is shocked by your swift response and apologizes to you.`,
-          popularity: 10,
+          popularity: 30,
         },
         no: {
           description:
             "The lack of advertisements has driven back your income.",
-          wealth: -10,
+          wealth: -20,
         },
       },
     },
@@ -197,7 +226,7 @@ const EVENTS = [
   {
     description: `${VITAL1} is looking for a place to celebrate his birthday with friends and knocks on your place. Do you let him in?`,
     yes: {
-      description: `Oops: ${BARISTA1} spoiled a cup of ice cream over ${VITAL1}. ${VITAL1} seems very upset. Do you want to charge no price to make up for it?`,
+      description: `Oops: your barista, ${BARISTA1}, spoiled a cup of ice cream over ${VITAL1}. ${VITAL1} seems very upset. Do you want to charge no price to make up for it?`,
       yes: {
         description: `${VITAL1} appreciates your kindness.`,
         popularity: 20,
@@ -229,7 +258,7 @@ const EVENTS = [
       },
       no: {
         description:
-          "Mike doesn't seem to be happy. Hopefully comes back happier tomorrow",
+          "Mike doesn't seem to be happy. Hopefully he comes back happier tomorrow.",
         popularity: -10,
       },
     },
@@ -273,6 +302,32 @@ const EVENTS = [
     no: {
       description: `${FRIEND1} is disappointed you don't want to play.`,
       popularity: -10,
+    },
+  },
+  {
+    description: `Your barista, ${BARISTA1}, informs yu that ${VILLAIN2} has started decorating a cafe in your street. ${VILLAIN2}'s cafes are very popular. Do you want to sabotage the place?`,
+    yes: {
+      description: `The police has arrested you, but you were able to buy yourself out of jail time.`,
+      wealth: -20,
+      popularity: -30,
+    },
+    no: {
+      description: `Should we beg for ${VILLAIN2} to set up his cafe elsewhere?`,
+      yes: {
+        description: `${VILLAIN2} makes fun of you for your poor attempt at reducing competition.`,
+        popularity: -20,
+      },
+      no: {
+        description: `Should we make an offer to ${VILLAIN2} to work together to reduce competitiveness?`,
+        yes: {
+          description: `Working with ${VILLAIN2} has allowed prices to stay high, but some of your customers have left for ${VILLAIN2}'s cafe.`,
+          popularity: -20,
+        },
+        no: {
+          description: `The competition of ${VILLAIN2} has driven down your sales.`,
+          wealth: -20,
+        },
+      },
     },
   },
 ];
