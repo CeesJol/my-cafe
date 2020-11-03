@@ -50,6 +50,7 @@ module.exports = {
 		%s
 		%s`,
     SUB_EVENT: `%s`,
+    NEW_GAME: "Let's start a new game. %s",
     // Basic stuff
     FALLBACK_MESSAGE_DURING_GAME: `I didn't understand that. Please answer with yes or no. %s`,
     FALLBACK_MESSAGE_OUTSIDE_GAME: `I can't help you with that. I will come up with a number between 0 and 100 and you try to guess it by saying a number in that range. Would you like to play?`,

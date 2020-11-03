@@ -281,7 +281,7 @@ const handleNo = (handlerInput) => {
 
     attributesManager.setSessionAttributes(attributes);
 
-    speechOutput = requestAttributes.t(event.description);
+    speechOutput = requestAttributes.t("NEW_GAME", event.description);
 
     return handlerInput.responseBuilder
       .speak(speechOutput)
