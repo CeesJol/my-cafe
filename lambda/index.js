@@ -78,10 +78,28 @@ const HelpIntent = {
   },
   handle(handlerInput) {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+    let CTA;
+    switch (sessionAttributes.gameState) {
+      case "CONTINUE_OR_NEW":
+        CTA = "You still have an open game. Do you want to continue this game?";
+        break;
+      case "NEW_GAME_OR_QUIT":
+        CTA = "Would you like to play?";
+        break;
+      case "PLAYING":
+        CTA = sessionAttributes.event.description;
+        break;
+      default:
+        CTA = "Would you like to play a game?";
+    }
+
+    const speechOutput = requestAttributes.t("HELP_MESSAGE", CTA);
 
     return handlerInput.responseBuilder
-      .speak(requestAttributes.t("HELP_MESSAGE"))
-      .reprompt(requestAttributes.t("HELP_MESSAGE"))
+      .speak(speechOutput)
+      .reprompt(speechOutput)
       .getResponse();
   },
 };

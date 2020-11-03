@@ -35,7 +35,8 @@
           "examplePhrases": [
 						"Alexa open my cafe",
 						"Alexa open my café",
-            "Alexa open my cafeteria"
+						"Alexa launch my cafe",
+						"Alexa launch my café"
           ],
           "name": "My Cafe",
           "summary": "Create a cafe, decide your strategy and earn income!"

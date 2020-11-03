@@ -16,7 +16,7 @@ module.exports = {
     LAUNCH_MESSAGE_NEW_GAME: `Welcome back to My Cafe. 
 		%s
 		You start with 50 wealth and 50 popularity.
-		Remember: stay between 0 and 100 to keep your cafe alive!
+		Remember: stay between 0 and 100 to keep your cafe alive! 
 		%s`,
     // Game start: user's first game
     // - Event
@@ -24,7 +24,7 @@ module.exports = {
 		You recently opened your cafe and your customers seem to be loving your blends.
 		For each day in your cafe, I will ask you a difficult question and you need to answer yes or no to each question.
 		You start with 50 wealth and 50 popularity. 
-		Stay between 0 and 100 to keep your cafe alive!
+		Stay between 0 and 100 to keep your cafe alive! 
 		%s`,
     // Game over
     // - result of action
@@ -54,8 +54,9 @@ module.exports = {
     FALLBACK_MESSAGE_DURING_GAME: `I didn't understand that. Please answer with yes or no. %s`,
     FALLBACK_MESSAGE_OUTSIDE_GAME: `I can't help you with that. I will come up with a number between 0 and 100 and you try to guess it by saying a number in that range. Would you like to play?`,
     CONTINUE_MESSAGE: "Say yes to play or no to quit.",
-    HELP_MESSAGE:
-      "I am thinking of a number between zero and one hundred, try to guess it and I will tell you if it is higher or lower.",
+    HELP_MESSAGE: `I will ask you questions and you should answer them with either yes or no. 
+			When you answer, your wealth and popularity may go up or down. 
+			Keep both your wealth and popularity between 0 and 100 to survive. %s`,
     ERROR_MESSAGE: "Sorry, an error occurred.",
     RESET_SUCCESS:
       "I resetted you successfully. Would you like to play a new game?",
